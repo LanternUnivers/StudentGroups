@@ -4,6 +4,7 @@ import os
 import pandas as pd
 from geopy.geocoders import Nominatim
 from PIL import Image
+import bcrypt
 
 # 定数
 DATA_FILE = "data/groups.json"
@@ -28,6 +29,13 @@ def save_icon(icon_file, group_name):
     with open(icon_path, "wb") as f:
         f.write(icon_file.getbuffer())
     return icon_path
+
+# パスワードハッシュ化関連
+def hash_password(password):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def check_password(password, hashed):
+    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
 
 # イベント一覧表示（応募機能付き）
 def display_event_list(groups):
@@ -126,7 +134,7 @@ def add_group_form(groups):
                     icon_path = save_icon(icon_file, new_group_name) if icon_file else None
                     groups.append({
                         "name": new_group_name,
-                        "password": group_password,
+                        "password": hash_password(group_password),  # ハッシュ化
                         "events": [],
                         "icon": icon_path
                     })
@@ -210,7 +218,7 @@ def admin_panel(groups):
 
         if st.button("認証"):
             group = next((g for g in groups if g["name"] == selected_group), None)
-            if group and group["password"] == password_input:
+            if group and check_password(password_input, group["password"]):  # ハッシュを比較
                 st.session_state["authenticated_group"] = selected_group
                 st.session_state["authenticated"] = True
                 st.success(f"サークル '{selected_group}' の管理画面にアクセスしました！")
