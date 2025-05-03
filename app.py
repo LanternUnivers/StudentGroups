@@ -8,7 +8,7 @@ from PIL import Image
 # 定数
 DATA_FILE = "data/groups.json"
 ICON_FOLDER = "data/icons"
-DEFAULT_ICON_URL = "https://via.placeholder.com/50"
+DEFAULT_ICON_URL = "data\icons\default_icon.png"
 
 # データ操作関連
 def load_data():
@@ -36,7 +36,8 @@ def display_event_list(groups):
         for group_index, group in enumerate(groups):  # グループのインデックスを取得
             col1, col2 = st.columns([1, 9])
             with col1:
-                icon_path = group.get("icon", DEFAULT_ICON_URL)
+                # 修正: icon_path が None の場合にデフォルトURLを使用
+                icon_path = group.get("icon") or DEFAULT_ICON_URL
                 st.image(icon_path, width=50)
             with col2:
                 st.markdown(f"## {group['name']}")
@@ -240,20 +241,29 @@ def main():
         unsafe_allow_html=True
     )
 
+    # セッションに現在のタブを保存
+    if "current_tab" not in st.session_state:
+        st.session_state["current_tab"] = "イベント一覧"  # 初期タブを設定
+
+    # タブの選択
+    tabs = ["イベント一覧", "サークル・イベントを登録する", "イベントマップ", "管理者画面"]
+    selected_tab = st.selectbox("タブを選択してください", tabs, index=tabs.index(st.session_state["current_tab"]))
+
+    # タブが変更された場合にリロード
+    if selected_tab != st.session_state["current_tab"]:
+        st.session_state["current_tab"] = selected_tab
+        st.rerun()
+
+    # タブごとの処理
     groups = load_data()
-    tab1, tab2, tab3, tab4 = st.tabs(["イベント一覧", "サークル・イベントを登録する", "イベントマップ", "管理者画面"])
-
-    with tab1:
+    if selected_tab == "イベント一覧":
         display_event_list(groups)
-
-    with tab2:
+    elif selected_tab == "サークル・イベントを登録する":
         add_group_form(groups)
         add_event_form(groups)
-
-    with tab3:
+    elif selected_tab == "イベントマップ":
         display_map(groups)
-
-    with tab4:
+    elif selected_tab == "管理者画面":
         admin_panel(groups)
 
 if __name__ == "__main__":
