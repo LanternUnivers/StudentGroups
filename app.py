@@ -161,39 +161,72 @@ def display_map(groups):
     else:
         st.write("現在、地図に表示できるイベントはありません。")
 
-# 管理者画面（イベント個別削除機能をアップデート）
+# 管理者画面
 def admin_panel(groups):
     st.header("管理者画面")
-    selected_group = st.selectbox("管理するサークルを選択してください", [group["name"] for group in groups])
-    password_input = st.text_input("パスワードを入力してください", type="password")
 
-    if st.button("認証"):
-        group = next((g for g in groups if g["name"] == selected_group), None)
-        if group and group["password"] == password_input:
-            st.success(f"サークル '{selected_group}' の管理画面にアクセスしました！")
-            st.subheader("登録済みのイベント")
-            if "events" in group and group["events"]:
-                for event_index, event in enumerate(group["events"]):  # イベントのインデックスを取得
-                    st.markdown(f"### イベント名: {event['title']}")
-                    # 応募者情報の表示
-                    if "applicants" in event and event["applicants"]:
-                        st.markdown("#### 応募者リスト:")
-                        for applicant in event["applicants"]:
-                            st.markdown(f"- 名前: {applicant['name']}, メール: {applicant['email']}")
-                    else:
-                        st.markdown("- 応募者なし")
-                    
-                    # イベント削除ボタン（キーにインデックスを含める）
-                    delete_key = f"delete_{selected_group}_{event_index}"  # 一意なキーを生成
-                    if st.button(f"イベント '{event['title']}' を削除", key=delete_key):
-                        group["events"].pop(event_index)  # インデックスを使用して削除
-                        save_data(groups)
-                        st.success(f"イベント '{event['title']}' を削除しました！")
-                        st.experimental_rerun()  # ページをリロードして変更を反映
+    # セッションに初期値がなければ初期化
+    if "authenticated_group" not in st.session_state:
+        st.session_state["authenticated_group"] = None
+        st.session_state["authenticated"] = False
+
+    if not st.session_state["authenticated"]:
+        selected_group = st.selectbox("管理するサークルを選択してください", [group["name"] for group in groups])
+        password_input = st.text_input("パスワードを入力してください", type="password")
+
+        if st.button("認証"):
+            group = next((g for g in groups if g["name"] == selected_group), None)
+            if group and group["password"] == password_input:
+                st.session_state["authenticated_group"] = selected_group
+                st.session_state["authenticated"] = True
+                st.success(f"サークル '{selected_group}' の管理画面にアクセスしました！")
+                st.rerun()
             else:
-                st.markdown("- イベントなし")
+                st.error("パスワードが間違っています。")
+    else:
+        # ログイン済みのグループ名を取得
+        selected_group = st.session_state["authenticated_group"]
+        group = next((g for g in groups if g["name"] == selected_group), None)
+        st.success(f"サークル '{selected_group}' の管理画面にアクセス中")
+        st.subheader("登録済みのイベント")
+
+        if group and "events" in group and group["events"]:
+            for event_index, event in enumerate(group["events"]):
+                st.markdown(f"### イベント名: {event['title']}")
+
+                if "applicants" in event and event["applicants"]:
+                    st.markdown("#### 応募者リスト:")
+                    for applicant in event["applicants"]:
+                        st.markdown(f"- 名前: {applicant['name']}, メール: {applicant['email']}")
+                else:
+                    st.markdown("- 応募者なし")
+
+                delete_button_key = f"delete_{group['name']}_{event_index}"
+                if st.button(f"イベントを削除 ({event['title']})", key=delete_button_key):
+                    st.session_state["delete_event"] = {
+                        "group_name": group["name"],
+                        "event_index": event_index
+                    }
+                    st.rerun()
+
+            # 削除処理（rerun後）
+            if "delete_event" in st.session_state:
+                to_delete = st.session_state.pop("delete_event")
+                if to_delete["group_name"] == group["name"]:
+                    if 0 <= to_delete["event_index"] < len(group["events"]):
+                        deleted_event = group["events"].pop(to_delete["event_index"])
+                        save_data(groups)
+                        st.success(f"イベント '{deleted_event['title']}' を削除しました！")
+                        st.rerun()
         else:
-            st.error("パスワードが間違っています。")
+            st.markdown("- イベントなし")
+
+        # ログアウトボタン
+        if st.button("ログアウト"):
+            st.session_state["authenticated"] = False
+            st.session_state["authenticated_group"] = None
+            st.rerun()
+
 
 # メイン関数
 def main():
@@ -208,7 +241,7 @@ def main():
     )
 
     groups = load_data()
-    tab1, tab2, tab3, tab4 = st.tabs(["イベント一覧", "イベントを登録する", "イベントマップ", "管理者画面"])
+    tab1, tab2, tab3, tab4 = st.tabs(["イベント一覧", "サークル・イベントを登録する", "イベントマップ", "管理者画面"])
 
     with tab1:
         display_event_list(groups)
