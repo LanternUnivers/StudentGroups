@@ -1,17 +1,17 @@
 [
     {
-        "name": "テックサークル",
-        "description": "技術を学ぶ学生団体",
+        "name": "サークルA",
+        "password": "password123",
+        "icon": "data/icons/サークルA.png",
         "events": [
             {
-                "title": "プログラミング勉強会",
-                "description": "初心者向けのプログラミング勉強会です。",
-                "date": "2025-05-10"
-            },
-            {
-                "title": "あああ",
-                "description": "ああ",
-                "date": "2025-05-22"
+                "title": "hoge",
+                "description": "テスト３",
+                "date": "2025-05-17",
+                "location": "東京駅",
+                "latitude": 35.6820513,
+                "longitude": 139.7658294,
+                "capacity": 4
             }
         ]
     }
