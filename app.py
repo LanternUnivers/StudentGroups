@@ -1,6 +1,8 @@
 import streamlit as st
 import json
 import os
+import pandas as pd  # 地図表示のために必要
+from geopy.geocoders import Nominatim  # 地名から緯度・経度を取得するために必要
 
 # データファイルのパス
 DATA_FILE = "data/groups.json"
@@ -25,7 +27,7 @@ def main():
     groups = load_data()
 
     # タブで機能を切り替え
-    tab1, tab2, tab3, tab4 = st.tabs(["イベント一覧", "イベントを登録する", "イベントに参加する", "サークル代表者用"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["イベント一覧", "イベントを登録する", "イベントに参加する", "サークル代表者用", "イベントマップ"])
 
     # イベント一覧表示
     with tab1:
@@ -34,7 +36,7 @@ def main():
             for group in groups:
                 st.subheader(group["name"])
                 if "events" in group and group["events"]:
-                    for event in group["events"]:
+                    for index, event in enumerate(group["events"]):  # インデックスを追加
                         st.write(f"**イベント名:** {event['title']}")
                         st.write(f"**場所:** {event.get('location', '未設定')}")
                         st.write(f"**日時:** {event.get('date', '未設定')}")
@@ -42,7 +44,8 @@ def main():
                         st.write(f"**応募対象:** {event.get('target', '未設定')}")
                         st.write(f"**応募人数:** {event.get('capacity', '未設定')}")
                         
-                        if st.button(f"参加する ({event['title']})", key=f"join_{group['name']}_{event['title']}"):
+                        # インデックスを含めて key を一意にする
+                        if st.button(f"参加する ({event['title']})", key=f"join_{group['name']}_{event['title']}_{index}"):
                             st.session_state["selected_event"] = {"group": group["name"], "event": event["title"]}
                             st.session_state["tab"] = "イベントに参加する"
                         st.write("---")
@@ -80,23 +83,38 @@ def main():
             event_title = st.text_input("イベント名")
             event_description = st.text_area("イベントの説明")
             event_date = st.date_input("イベント日時")
+            event_location_name = st.text_input("イベントの場所 (地名)", placeholder="例: 東京タワー")
             submitted = st.form_submit_button("登録")
 
             if submitted:
-                if group_name and event_title and event_description and event_date:
-                    # 該当する団体を検索してイベントを追加
-                    for group in groups:
-                        if group["name"] == group_name:
-                            if "events" not in group:
-                                group["events"] = []
-                            group["events"].append({
-                                "title": event_title,
-                                "description": event_description,
-                                "date": str(event_date)
-                            })
-                            save_data(groups)
-                            st.success(f"イベント '{event_title}' を団体 '{group_name}' に登録しました！")
-                            break
+                if group_name and event_title and event_description and event_date and event_location_name:
+                    try:
+                        # 地名から緯度・経度を取得
+                        geolocator = Nominatim(user_agent="student-groups-app")
+                        location = geolocator.geocode(event_location_name)
+
+                        if location:
+                            lat, lon = location.latitude, location.longitude
+                            # 該当する団体を検索してイベントを追加
+                            for group in groups:
+                                if group["name"] == group_name:
+                                    if "events" not in group:
+                                        group["events"] = []
+                                    group["events"].append({
+                                        "title": event_title,
+                                        "description": event_description,
+                                        "date": str(event_date),
+                                        "location": event_location_name,
+                                        "latitude": lat,
+                                        "longitude": lon
+                                    })
+                                    save_data(groups)
+                                    st.success(f"イベント '{event_title}' を団体 '{group_name}' に登録しました！")
+                                    break
+                        else:
+                            st.error("指定された地名から緯度・経度を取得できませんでした。正しい地名を入力してください。")
+                    except Exception as e:
+                        st.error(f"エラーが発生しました: {e}")
                 else:
                     st.error("すべての項目を入力してください。")
 
@@ -148,8 +166,8 @@ def main():
         group_data = next((group for group in groups if group["name"] == selected_group), None)
 
         if group_data:
-            # サークルごとのパスワードを設定（ここでは仮にサークル名をパスワードにしています）
-            correct_password = group_data.get("password", selected_group)  # デフォルトでサークル名をパスワードに
+            # サークルごとのパスワードを確認
+            correct_password = group_data.get("password", selected_group)
 
             if password == correct_password:
                 st.success(f"認証に成功しました！ サークル: {selected_group}")
@@ -162,13 +180,13 @@ def main():
                         st.write(f"**応募対象:** {event.get('target', '未設定')}")
                         st.write(f"**応募人数:** {event.get('capacity', '未設定')}")
                         
-                        # 参加者一覧を表示
-                        if "participants" in event and event["participants"]:
-                            st.write("**参加者一覧:**")
-                            for participant in event["participants"]:
-                                st.write(f"- {participant['name']} ({participant['email']})")
-                        else:
-                            st.write("**参加者一覧:** 現在参加者はいません。")
+                        # イベント削除ボタン
+                        if st.button(f"イベントを削除 ({event['title']})", key=f"delete_{group_data['name']}_{event['title']}"):
+                            group_data["events"].remove(event)
+                            save_data(groups)
+                            st.success(f"イベント '{event['title']}' を削除しました！")
+                            # 状態をリセットして再描画
+                            st.query_params = {"refresh": "true"}
                         st.write("---")
                 else:
                     st.write("現在、このサークルには登録されたイベントがありません。")
@@ -176,6 +194,32 @@ def main():
                 st.error("パスワードが間違っています。")
         else:
             st.error("選択されたサークルが見つかりません。")
+
+    # イベントマップ表示
+    with tab5:
+        st.header("イベントマップ")
+        map_data = []
+        for group in groups:
+            if "events" in group and group["events"]:
+                for event in group["events"]:
+                    if "latitude" in event and "longitude" in event:
+                        map_data.append({
+                            "lat": event["latitude"],
+                            "lon": event["longitude"],
+                            "event": event["title"],
+                            "group": group["name"],
+                            "description": event.get("description", "説明なし"),
+                            "date": event.get("date", "未設定"),
+                            "location": event.get("location", "未設定")
+                        })
+        if map_data:
+            df = pd.DataFrame(map_data)
+            st.map(df)
+            st.write("**イベント情報一覧:**")
+            for data in map_data:
+                st.write(f"- **イベント名:** {data['event']}, **団体名:** {data['group']}, **場所:** {data['location']}, **日時:** {data['date']}, **説明:** {data['description']}")
+        else:
+            st.write("現在、地図に表示できるイベントはありません。")
 
 if __name__ == "__main__":
     main()
