@@ -3,6 +3,7 @@
         "name": "テックサークル",
         "description": "技術を学ぶ学生団体",
         "password": "tech123",
+        "password": "tech123",
         "events": [
             {
                 "title": "hoge",
