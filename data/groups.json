@@ -11,8 +11,49 @@
                 "location": "東京駅",
                 "latitude": 35.6820513,
                 "longitude": 139.7658294,
-                "capacity": 4
+                "capacity": 4,
+                "applicants": [
+                    {
+                        "name": "ｃ",
+                        "email": "c@example.com"
+                    }
+                ]
+            },
+            {
+                "title": "test",
+                "description": "ほげ",
+                "date": "2025-05-03",
+                "location": "あべのハルカス",
+                "latitude": 34.6459232,
+                "longitude": 135.5139658,
+                "capacity": 1
             }
         ]
+    },
+    {
+        "name": "test",
+        "password": "test",
+        "events": [
+            {
+                "title": "test",
+                "description": "test",
+                "date": "2025-05-22",
+                "location": "東京ドーム",
+                "latitude": 35.7055705,
+                "longitude": 139.7519705,
+                "capacity": 100,
+                "applicants": [
+                    {
+                        "name": "hage",
+                        "email": "a@example.com"
+                    },
+                    {
+                        "name": "hohetest",
+                        "email": "b@example.com"
+                    }
+                ]
+            }
+        ],
+        "icon": null
     }
 ]
