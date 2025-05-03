@@ -19,7 +19,7 @@ def save_data(data):
 
 # メインアプリ
 def main():
-    st.title("学生団体イベントアプリ")
+    st.title("学生団体イベントアプリ3")
 
     # データをロード
     groups = load_data()
