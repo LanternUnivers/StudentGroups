@@ -73,6 +73,9 @@ def display_event_list(groups):
                                     st.error("名前とメールアドレスを入力してください。")
             else:
                 st.markdown("<p style='color: gray;'>現在、この団体には登録されたイベントがありません。</p>", unsafe_allow_html=True)
+            
+            # 団体間に空白行を追加
+            st.markdown("<hr style='border: none; height: 20px;'>", unsafe_allow_html=True)
     else:
         st.markdown("<p style='color: gray;'>現在、登録されている学生団体はありません。</p>", unsafe_allow_html=True)
 

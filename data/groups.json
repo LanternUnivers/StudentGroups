@@ -55,5 +55,11 @@
             }
         ],
         "icon": null
+    },
+    {
+        "name": "hogehoge",
+        "password": "hoge",
+        "events": [],
+        "icon": null
     }
 ]
