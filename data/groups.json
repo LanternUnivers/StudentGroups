@@ -1,56 +1,26 @@
 [
     {
-        "name": "テックサークル",
-        "description": "技術を学ぶ学生団体",
-        "password": "tech123",
-        "password": "tech123",
+        "name": "サークルA",
+        "password": "password123",
+        "icon": "data/icons/サークルA.png",
         "events": [
             {
-                "title": "hoge",
-                "description": "a",
+                "title": "イベント1",
+                "description": "説明1",
+                "date": "2025-05-03",
+                "location": "東京タワー",
+                "latitude": 35.6586,
+                "longitude": 139.7454,
+                "capacity": 50
+            },
+            {
+                "title": "test",
+                "description": "test",
                 "date": "2025-05-21",
                 "location": "東京駅",
-                "latitude": 35.6815523,
-                "longitude": 139.7680472
-            },
-            {
-                "title": "東海大",
-                "description": "a",
-                "date": "2025-05-20",
-                "location": "東海大学",
-                "latitude": 24.1788982,
-                "longitude": 120.6045034
-            },
-            {
-                "title": "東海大",
-                "description": "a",
-                "date": "2025-05-20",
-                "location": "東海大学湘南キャンパス",
-                "latitude": 35.3638105,
-                "longitude": 139.2742266
-            },
-            {
-                "title": "ほげ品川",
-                "description": "あ",
-                "date": "2025-05-16",
-                "location": "東海大学品川キャンパス",
-                "latitude": 35.6378836,
-                "longitude": 139.7345696
-            }
-        ]
-    },
-    {
-        "name": "testtest",
-        "description": "テスト用サークル",
-        "password": "test123",
-        "events": [
-            {
-                "title": "hogehoge",
-                "description": "hogehoge",
-                "date": "2025-05-30",
-                "location": "カフェ",
-                "target": "社会人・学生",
-                "capacity": 20
+                "latitude": 35.6820513,
+                "longitude": 139.7658294,
+                "capacity": 15
             }
         ]
     }
