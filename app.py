@@ -33,7 +33,7 @@ def save_icon(icon_file, group_name):
 def display_event_list(groups):
     st.header("イベント一覧")
     if groups:
-        for group in groups:
+        for group_index, group in enumerate(groups):  # グループのインデックスを取得
             col1, col2 = st.columns([1, 9])
             with col1:
                 icon_path = group.get("icon", DEFAULT_ICON_URL)
@@ -41,7 +41,7 @@ def display_event_list(groups):
             with col2:
                 st.markdown(f"## {group['name']}")
             if "events" in group and group["events"]:
-                for event in group["events"]:
+                for event_index, event in enumerate(group["events"]):  # イベントのインデックスを取得
                     st.markdown(
                         f"""
                         <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #003366; color: white;">
@@ -56,9 +56,10 @@ def display_event_list(groups):
                     )
                     # 応募フォームを展開するボタン
                     with st.expander("応募する"):
-                        with st.form(f"apply_form_{event['title']}"):
-                            name = st.text_input("名前を入力してください", key=f"name_{event['title']}")
-                            email = st.text_input("メールアドレスを入力してください", key=f"email_{event['title']}")
+                        form_key = f"apply_form_{group_index}_{event_index}"  # インデックスを含めたキー
+                        with st.form(form_key):
+                            name = st.text_input("名前を入力してください", key=f"name_{group_index}_{event_index}")
+                            email = st.text_input("メールアドレスを入力してください", key=f"email_{group_index}_{event_index}")
                             submitted = st.form_submit_button("送信")
                             if submitted:
                                 if name and email:
@@ -160,7 +161,7 @@ def display_map(groups):
     else:
         st.write("現在、地図に表示できるイベントはありません。")
 
-# 管理者画面（イベント個別削除機能を追加）
+# 管理者画面（イベント個別削除機能をアップデート）
 def admin_panel(groups):
     st.header("管理者画面")
     selected_group = st.selectbox("管理するサークルを選択してください", [group["name"] for group in groups])
@@ -172,7 +173,7 @@ def admin_panel(groups):
             st.success(f"サークル '{selected_group}' の管理画面にアクセスしました！")
             st.subheader("登録済みのイベント")
             if "events" in group and group["events"]:
-                for event in group["events"]:
+                for event_index, event in enumerate(group["events"]):  # イベントのインデックスを取得
                     st.markdown(f"### イベント名: {event['title']}")
                     # 応募者情報の表示
                     if "applicants" in event and event["applicants"]:
@@ -182,9 +183,10 @@ def admin_panel(groups):
                     else:
                         st.markdown("- 応募者なし")
                     
-                    # イベント削除ボタン
-                    if st.button(f"イベント '{event['title']}' を削除", key=f"delete_{event['title']}"):
-                        group["events"].remove(event)
+                    # イベント削除ボタン（キーにインデックスを含める）
+                    delete_key = f"delete_{selected_group}_{event_index}"  # 一意なキーを生成
+                    if st.button(f"イベント '{event['title']}' を削除", key=delete_key):
+                        group["events"].pop(event_index)  # インデックスを使用して削除
                         save_data(groups)
                         st.success(f"イベント '{event['title']}' を削除しました！")
                         st.experimental_rerun()  # ページをリロードして変更を反映

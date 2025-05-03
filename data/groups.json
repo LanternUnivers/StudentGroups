@@ -5,28 +5,22 @@
         "icon": "data/icons/サークルA.png",
         "events": [
             {
-                "title": "イベント1",
-                "description": "説明1",
-                "date": "2025-05-03",
-                "location": "東京タワー",
-                "latitude": 35.6586,
-                "longitude": 139.7454,
-                "capacity": 50,
-                "applicants": [
-                    {
-                        "name": "test",
-                        "email": "test@example.com"
-                    }
-                ]
+                "title": "test",
+                "description": "テスト",
+                "date": "2025-05-23",
+                "location": "日本の皇居",
+                "latitude": 43.0606961,
+                "longitude": 141.3518106,
+                "capacity": 1
             },
             {
-                "title": "test",
-                "description": "test",
-                "date": "2025-05-21",
+                "title": "hoge",
+                "description": "テスト３",
+                "date": "2025-05-17",
                 "location": "東京駅",
                 "latitude": 35.6820513,
                 "longitude": 139.7658294,
-                "capacity": 15
+                "capacity": 4
             }
         ]
     }
