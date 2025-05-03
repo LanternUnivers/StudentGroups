@@ -265,14 +265,6 @@ def admin_panel(groups):
 # メイン関数
 def main():
     st.title("学生団体イベントアプリ")
-    st.markdown(
-        """
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <h1 style="margin: 0; font-size: 2.5rem;">Co-Act</h1>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
 
     # セッションに現在のタブを保存
     if "current_tab" not in st.session_state:
