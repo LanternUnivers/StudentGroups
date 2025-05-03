@@ -32,8 +32,38 @@ def save_icon(icon_file, group_name):
 # イベント一覧表示（応募機能付き）
 def display_event_list(groups):
     st.header("イベント一覧")
-    if groups:
-        for group_index, group in enumerate(groups):  # グループのインデックスを取得
+
+    # 検索ボックスと並び替えオプション
+    search_query = st.text_input("イベント名で検索", "")
+    sort_option = st.selectbox("並び替え", ["開催日時（昇順）", "開催日時（降順）", "イベント名（昇順）", "イベント名（降順）"])
+
+    # フィルタリングとソート
+    filtered_groups = []
+    for group in groups:
+        if "events" in group and group["events"]:
+            filtered_events = [
+                event for event in group["events"]
+                if search_query.lower() in event["title"].lower()
+            ]
+            if filtered_events:
+                group_copy = group.copy()
+                group_copy["events"] = filtered_events
+                filtered_groups.append(group_copy)
+
+    # 並び替え処理
+    for group in filtered_groups:
+        if sort_option == "開催日時（昇順）":
+            group["events"].sort(key=lambda x: x.get("date", ""))
+        elif sort_option == "開催日時（降順）":
+            group["events"].sort(key=lambda x: x.get("date", ""), reverse=True)
+        elif sort_option == "イベント名（昇順）":
+            group["events"].sort(key=lambda x: x.get("title", "").lower())
+        elif sort_option == "イベント名（降順）":
+            group["events"].sort(key=lambda x: x.get("title", "").lower(), reverse=True)
+
+    # イベント表示
+    if filtered_groups:
+        for group_index, group in enumerate(filtered_groups):  # グループのインデックスを取得
             col1, col2 = st.columns([1, 9])
             with col1:
                 # 修正: icon_path が None の場合にデフォルトURLを使用
@@ -77,7 +107,7 @@ def display_event_list(groups):
             # 団体間に空白行を追加
             st.markdown("<hr style='border: none; height: 20px;'>", unsafe_allow_html=True)
     else:
-        st.markdown("<p style='color: gray;'>現在、登録されている学生団体はありません。</p>", unsafe_allow_html=True)
+        st.markdown("<p style='color: gray;'>該当するイベントが見つかりません。</p>", unsafe_allow_html=True)
 
 # サークル追加フォーム
 def add_group_form(groups):
