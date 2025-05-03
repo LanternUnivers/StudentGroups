@@ -32,8 +32,38 @@ def save_icon(icon_file, group_name):
 # イベント一覧表示（応募機能付き）
 def display_event_list(groups):
     st.header("イベント一覧")
-    if groups:
-        for group_index, group in enumerate(groups):  # グループのインデックスを取得
+
+    # 検索ボックスと並び替えオプション
+    search_query = st.text_input("イベント名で検索", "")
+    sort_option = st.selectbox("並び替え", ["開催日時（昇順）", "開催日時（降順）", "イベント名（昇順）", "イベント名（降順）"])
+
+    # フィルタリングとソート
+    filtered_groups = []
+    for group in groups:
+        if "events" in group and group["events"]:
+            filtered_events = [
+                event for event in group["events"]
+                if search_query.lower() in event["title"].lower()
+            ]
+            if filtered_events:
+                group_copy = group.copy()
+                group_copy["events"] = filtered_events
+                filtered_groups.append(group_copy)
+
+    # 並び替え処理
+    for group in filtered_groups:
+        if sort_option == "開催日時（昇順）":
+            group["events"].sort(key=lambda x: x.get("date", ""))
+        elif sort_option == "開催日時（降順）":
+            group["events"].sort(key=lambda x: x.get("date", ""), reverse=True)
+        elif sort_option == "イベント名（昇順）":
+            group["events"].sort(key=lambda x: x.get("title", "").lower())
+        elif sort_option == "イベント名（降順）":
+            group["events"].sort(key=lambda x: x.get("title", "").lower(), reverse=True)
+
+    # イベント表示
+    if filtered_groups:
+        for group_index, group in enumerate(filtered_groups):  # グループのインデックスを取得
             col1, col2 = st.columns([1, 9])
             with col1:
                 icon_path = group.get("icon", DEFAULT_ICON_URL)
@@ -73,7 +103,7 @@ def display_event_list(groups):
             else:
                 st.markdown("<p style='color: gray;'>現在、この団体には登録されたイベントがありません。</p>", unsafe_allow_html=True)
     else:
-        st.markdown("<p style='color: gray;'>現在、登録されている学生団体はありません。</p>", unsafe_allow_html=True)
+        st.markdown("<p style='color: gray;'>該当するイベントが見つかりません。</p>", unsafe_allow_html=True)
 
 # サークル追加フォーム
 def add_group_form(groups):
@@ -231,15 +261,7 @@ def admin_panel(groups):
 # メイン関数
 def main():
     st.title("学生団体イベントアプリ")
-    st.markdown(
-        """
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <h1 style="margin: 0; font-size: 2.5rem;">Co-Act</h1>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
+    
     groups = load_data()
     tab1, tab2, tab3, tab4 = st.tabs(["イベント一覧", "サークル・イベントを登録する", "イベントマップ", "管理者画面"])
 
