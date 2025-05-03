@@ -29,7 +29,7 @@ def save_icon(icon_file, group_name):
         f.write(icon_file.getbuffer())
     return icon_path
 
-# イベント一覧表示
+# イベント一覧表示（応募機能付き）
 def display_event_list(groups):
     st.header("イベント一覧")
     if groups:
@@ -49,11 +49,26 @@ def display_event_list(groups):
                             <p><strong>📍 場所:</strong> {event.get('location', '未設定')}</p>
                             <p><strong>📅 日時:</strong> {event.get('date', '未設定')}</p>
                             <p><strong>📝 イベント内容:</strong> {event.get('description', '未設定')}</p>
-                            <p><strong>📊 応募人数:</strong> {event.get('capacity', '未設定')}</p>
+                            <p><strong>📊 募集人数:</strong> {event.get('capacity', '未設定')}</p>
                         </div>
                         """,
                         unsafe_allow_html=True
                     )
+                    # 応募フォームを展開するボタン
+                    with st.expander("応募する"):
+                        with st.form(f"apply_form_{event['title']}"):
+                            name = st.text_input("名前を入力してください", key=f"name_{event['title']}")
+                            email = st.text_input("メールアドレスを入力してください", key=f"email_{event['title']}")
+                            submitted = st.form_submit_button("送信")
+                            if submitted:
+                                if name and email:
+                                    if "applicants" not in event:
+                                        event["applicants"] = []
+                                    event["applicants"].append({"name": name, "email": email})
+                                    save_data(groups)
+                                    st.success(f"{name} さんがイベント '{event['title']}' に応募しました！")
+                                else:
+                                    st.error("名前とメールアドレスを入力してください。")
             else:
                 st.markdown("<p style='color: gray;'>現在、この団体には登録されたイベントがありません。</p>", unsafe_allow_html=True)
     else:
@@ -145,7 +160,7 @@ def display_map(groups):
     else:
         st.write("現在、地図に表示できるイベントはありません。")
 
-# 管理者画面（パスワード認証付き）
+# 管理者画面（イベント個別削除機能を追加）
 def admin_panel(groups):
     st.header("管理者画面")
     selected_group = st.selectbox("管理するサークルを選択してください", [group["name"] for group in groups])
@@ -158,11 +173,21 @@ def admin_panel(groups):
             st.subheader("登録済みのイベント")
             if "events" in group and group["events"]:
                 for event in group["events"]:
-                    st.markdown(f"- イベント名: {event['title']}")
-                if st.button("このサークルの全イベントを削除"):
-                    group["events"] = []
-                    save_data(groups)
-                    st.success(f"サークル '{selected_group}' の全イベントを削除しました！")
+                    st.markdown(f"### イベント名: {event['title']}")
+                    # 応募者情報の表示
+                    if "applicants" in event and event["applicants"]:
+                        st.markdown("#### 応募者リスト:")
+                        for applicant in event["applicants"]:
+                            st.markdown(f"- 名前: {applicant['name']}, メール: {applicant['email']}")
+                    else:
+                        st.markdown("- 応募者なし")
+                    
+                    # イベント削除ボタン
+                    if st.button(f"イベント '{event['title']}' を削除", key=f"delete_{event['title']}"):
+                        group["events"].remove(event)
+                        save_data(groups)
+                        st.success(f"イベント '{event['title']}' を削除しました！")
+                        st.experimental_rerun()  # ページをリロードして変更を反映
             else:
                 st.markdown("- イベントなし")
         else:
@@ -170,7 +195,7 @@ def admin_panel(groups):
 
 # メイン関数
 def main():
-    st.title("学生団体イベントアプリ3")
+    st.title("学生団体イベントアプリ")
     st.markdown(
         """
         <div style="display: flex; align-items: center; gap: 10px;">

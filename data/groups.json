@@ -11,7 +11,13 @@
                 "location": "東京タワー",
                 "latitude": 35.6586,
                 "longitude": 139.7454,
-                "capacity": 50
+                "capacity": 50,
+                "applicants": [
+                    {
+                        "name": "test",
+                        "email": "test@example.com"
+                    }
+                ]
             },
             {
                 "title": "test",
