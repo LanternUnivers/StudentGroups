@@ -2,16 +2,62 @@
     {
         "name": "テックサークル",
         "description": "技術を学ぶ学生団体",
+        "password": "tech123",  
         "events": [
             {
                 "title": "プログラミング勉強会",
                 "description": "初心者向けのプログラミング勉強会です。",
-                "date": "2025-05-10"
+                "date": "2025-05-10",
+                "location": "オンライン",
+                "target": "初心者",
+                "capacity": 50,
+                "participants": [
+                    {
+                        "name": "test",
+                        "email": "example@example.com"
+                    },
+                    {
+                        "name": "hoge",
+                        "email": "example@example.com"
+                    }
+                ]
             },
             {
                 "title": "あああ",
                 "description": "ああ",
-                "date": "2025-05-22"
+                "date": "2025-05-22",
+                "location": "大学キャンパス",
+                "target": "全学生",
+                "capacity": 30,
+                "participants": [
+                    {
+                        "name": "test",
+                        "email": "example@example.com"
+                    }
+                ]
+            },
+            {
+                "title": "aaaa",
+                "description": "hogehoge",
+                "date": "2025-05-21",
+                "location": "市民ホール",
+                "target": "技術に興味がある人",
+                "capacity": 100
+            }
+        ]
+    },
+    {
+        "name": "testtest",
+        "description": "テスト用サークル",
+        "password": "test123",  
+        "events": [
+            {
+                "title": "hogehoge",
+                "description": "hogehoge",
+                "date": "2025-05-30",
+                "location": "カフェ",
+                "target": "社会人・学生",
+                "capacity": 20
             }
         ]
     }
