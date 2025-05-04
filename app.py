@@ -402,7 +402,7 @@ def genre_selection_page():
         with cols[index % 3]:  # 各列に順番に配置
             image_path = genre["image"]
             if os.path.exists(image_path):  # ファイルが存在するか確認
-                st.image(image_path, caption=genre["name"], use_container_width=True)
+                st.image(image_path, caption=genre["name"])
             else:
                 st.error(f"画像が見つかりません: {image_path}")
 
