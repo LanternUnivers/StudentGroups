@@ -41,9 +41,12 @@ def check_password(password, hashed):
 def display_event_list(groups):
     st.header("イベント一覧")
 
-    # 検索ボックスと並び替えオプション
-    search_query = st.text_input("イベント名で検索", "")
-    sort_option = st.selectbox("並び替え", ["開催日時（昇順）", "開催日時（降順）", "イベント名（昇順）", "イベント名（降順）"])
+    # 検索ボックスとカテゴリー選択
+    col1, col2 = st.columns([8, 2])
+    with col1:
+        search_query = st.text_input("イベント名で検索", "")
+    with col2:
+        category_filter = st.multiselect("ジャンルごとに検索", ["新歓", "勉強会", "交流会", "スポーツ", "ボランティア", "ものづくり系", "旅行", "インターン", "追いコン"], key="category_filter")
 
     # フィルタリングとソート
     filtered_groups = []
@@ -51,69 +54,58 @@ def display_event_list(groups):
         if "events" in group and group["events"]:
             filtered_events = [
                 event for event in group["events"]
-                if search_query.lower() in event["title"].lower()
+                if (search_query.lower() in event["title"].lower()) and
+                   (not category_filter or event.get("category") in category_filter)  # カテゴリーフィルタ適用
             ]
             if filtered_events:
                 group_copy = group.copy()
                 group_copy["events"] = filtered_events
                 filtered_groups.append(group_copy)
 
-    # 並び替え処理
-    for group in filtered_groups:
-        if sort_option == "開催日時（昇順）":
-            group["events"].sort(key=lambda x: x.get("date", ""))
-        elif sort_option == "開催日時（降順）":
-            group["events"].sort(key=lambda x: x.get("date", ""), reverse=True)
-        elif sort_option == "イベント名（昇順）":
-            group["events"].sort(key=lambda x: x.get("title", "").lower())
-        elif sort_option == "イベント名（降順）":
-            group["events"].sort(key=lambda x: x.get("title", "").lower(), reverse=True)
-
-    # イベント表示
+    # イベント表示（既存のコードを再利用）
     if filtered_groups:
-        for group_index, group in enumerate(filtered_groups):  # グループのインデックスを取得
+        for group_index, group in enumerate(filtered_groups):
             col1, col2 = st.columns([1, 9])
             with col1:
-                # 修正: icon_path が None の場合にデフォルトURLを使用
                 icon_path = group.get("icon") or DEFAULT_ICON_URL
                 st.image(icon_path, width=50)
             with col2:
                 st.markdown(f"## {group['name']}")
             if "events" in group and group["events"]:
-                for event_index, event in enumerate(group["events"]):  # イベントのインデックスを取得
+                for event_index, event in enumerate(group["events"]):
+                    # セッション状態の初期化
+                    map_key = f"show_map_{group_index}_{event_index}"
+                    if map_key not in st.session_state:
+                        st.session_state[map_key] = False
+
+                    # イベント情報の表示
                     st.markdown(
                         f"""
                         <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #003366; color: white;">
                             <h4 style="color: #ffffff;">🎯 イベント名: {event['title']}</h4>
-                            <p><strong>📍 場所:</strong> {event.get('location', '未設定')}</p>
+                            <p><strong>📍 場所:</strong> <a href="#" id="location_{group_index}_{event_index}" style="color: #00c0ff; text-decoration: underline;" onclick="window.showMap('{map_key}')">{event.get('location', '未設定')}</a></p>
                             <p><strong>📅 日時:</strong> {event.get('date', '未設定')}</p>
                             <p><strong>📝 イベント内容:</strong> {event.get('description', '未設定')}</p>
                             <p><strong>📊 募集人数:</strong> {event.get('capacity', '未設定')}</p>
+                            <p><strong>🏷️ カテゴリー:</strong> {event.get('category', '未設定')}</p>
                         </div>
                         """,
                         unsafe_allow_html=True
                     )
-                    # 応募フォームを展開するボタン
-                    with st.expander("応募する"):
-                        form_key = f"apply_form_{group_index}_{event_index}"  # インデックスを含めたキー
-                        with st.form(form_key):
-                            name = st.text_input("名前を入力してください", key=f"name_{group_index}_{event_index}")
-                            email = st.text_input("メールアドレスを入力してください", key=f"email_{group_index}_{event_index}")
-                            submitted = st.form_submit_button("送信")
-                            if submitted:
-                                if name and email:
-                                    if "applicants" not in event:
-                                        event["applicants"] = []
-                                    event["applicants"].append({"name": name, "email": email})
-                                    save_data(groups)
-                                    st.success(f"{name} さんがイベント '{event['title']}' に応募しました！")
-                                else:
-                                    st.error("名前とメールアドレスを入力してください。")
+
+                    # 地図の表示
+                    if st.session_state[map_key]:
+                        st.map(pd.DataFrame([{
+                            "lat": event["latitude"],
+                            "lon": event["longitude"]
+                        }]))
+                        if st.button("地図を閉じる", key=f"close_map_{group_index}_{event_index}"):
+                            st.session_state[map_key] = False
+                    else:
+                        if st.button("地図を見る", key=f"open_map_{group_index}_{event_index}"):
+                            st.session_state[map_key] = True
             else:
                 st.markdown("<p style='color: gray;'>現在、この団体には登録されたイベントがありません。</p>", unsafe_allow_html=True)
-            
-            # 団体間に空白行を追加
-            st.markdown("<hr style='border: none; height: 20px;'>", unsafe_allow_html=True)
     else:
         st.markdown("<p style='color: gray;'>該当するイベントが見つかりません。</p>", unsafe_allow_html=True)
 
@@ -143,7 +135,7 @@ def add_group_form(groups):
             else:
                 st.error("サークル名とパスワードを入力してください。")
 
-# イベント追加フォーム
+# イベント追加フォームにカテゴリーを追加
 def add_event_form(groups):
     st.subheader("イベントを追加する")
     with st.form("add_event_form"):
@@ -153,6 +145,7 @@ def add_event_form(groups):
         event_location_name = st.text_input("イベントの場所 (地名)", placeholder="例: 東京タワー")
         event_description = st.text_area("イベント内容")
         event_capacity = st.number_input("募集人数", min_value=1, step=1)
+        event_category = st.selectbox("カテゴリー", ["新歓", "勉強会", "交流会", "スポーツ", "ボランティア", "ものづくり系", "旅行", "インターン", "追いコン"])  # カテゴリー選択
         submitted = st.form_submit_button("登録")
 
         if submitted:
@@ -171,7 +164,8 @@ def add_event_form(groups):
                                     "location": event_location_name,
                                     "latitude": lat,
                                     "longitude": lon,
-                                    "capacity": event_capacity
+                                    "capacity": event_capacity,
+                                    "category": event_category  # カテゴリーを保存
                                 })
                                 save_data(groups)
                                 st.success(f"イベント '{event_title}' を団体 '{group_name}' に登録しました！")
@@ -269,17 +263,43 @@ def admin_panel(groups):
             st.session_state["authenticated_group"] = None
             st.rerun()
 
+# ジャンル選択ページ
+def genre_selection_page():
+    st.header("ジャンルを選択する")
+    st.write("ジャンル選択ページの内容をここに追加してください。")
 
 # メイン関数
 def main():
-    st.title("学生団体イベントアプリ")
+    # タイトルの背景を設定
+    title_bg_style = '''
+    <style>
+    .title-container {
+        font-family: 'Noto Serif JP', sans-serif; /* フォントを設定 */
+        background-color: #333333; /* 暗い背景色 */
+        color: white; /* 文字色を白に設定 */
+        padding: 10px; /* 内側の余白を設定 */
+        border-radius: 5px; /* 角を丸くする */
+        text-align: center; /* 中央揃え */
+        width: 100%; /* 横幅を100%に設定 */
+        margin-bottom: 30px; /* タイトル下に余白を追加 */
+    }
+    .spacer {
+        height: 20px; /* 空白の高さを設定 */
+    }
+    </style>
+    <div class="title-container">
+        <h1>学生団体イベントアプリ</h1>
+    </div>
+    <div class="spacer"></div> <!-- タイトルとタブの間に空白を挿入 -->
+    '''
+    st.markdown(title_bg_style, unsafe_allow_html=True)
 
     # セッションに現在のタブを保存
     if "current_tab" not in st.session_state:
         st.session_state["current_tab"] = "イベント一覧"  # 初期タブを設定
 
     # タブの選択
-    tabs = ["イベント一覧", "サークル・イベントを登録する", "イベントマップ", "管理者画面"]
+    tabs = ["イベント一覧", "ジャンルを選択する", "サークル・イベントを登録する", "イベントマップ", "管理者画面"]
     selected_tab = st.selectbox("タブを選択してください", tabs, index=tabs.index(st.session_state["current_tab"]))
 
     # タブが変更された場合にリロード
@@ -291,6 +311,8 @@ def main():
     groups = load_data()
     if selected_tab == "イベント一覧":
         display_event_list(groups)
+    elif selected_tab == "ジャンルを選択する":
+        genre_selection_page()
     elif selected_tab == "サークル・イベントを登録する":
         add_group_form(groups)
         add_event_form(groups)
