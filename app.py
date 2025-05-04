@@ -5,12 +5,6 @@ import pandas as pd
 from geopy.geocoders import Nominatim
 from PIL import Image
 import bcrypt
-import plotly.express as px
-import matplotlib.pyplot as plt
-from matplotlib import rcParams
-
-# 日本語フォントを設定
-rcParams['font.family'] = 'Yu Gothic'  # Windowsの場合、'Meiryo' も可
 
 # 定数
 DATA_FILE = "data/groups.json"
@@ -87,7 +81,7 @@ def display_event_list(groups):
                     # イベント情報の表示
                     st.markdown(
                         f"""
-                        <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #003366; color: white;">
+                        <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #808080; color: white;">
                             <h4 style="color: #ffffff;">🎯 イベント名: {event['title']}</h4>
                             <p><strong>📍 場所:</strong> <a href="#" id="location_{group_index}_{event_index}" style="color: #00c0ff; text-decoration: underline;" onclick="window.showMap('{map_key}')">{event.get('location', '未設定')}</a></p>
                             <p><strong>📅 日時:</strong> {event.get('date', '未設定')}</p>
@@ -133,7 +127,7 @@ def display_event_list(groups):
                         for review in event["reviews"]:
                             st.markdown(
                                 f"""
-                                <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #003366;">
+                                <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #ffffe0;">
                                     <strong>【満足度】</strong> 
                                     <p>⭐{review['satisfaction']} / ⭐5</p>
                                     <strong>【感想】</strong>
@@ -142,6 +136,8 @@ def display_event_list(groups):
                                 """,
                                 unsafe_allow_html=True
                             )
+                        # レビューの後に空白を挿入
+                        st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
 
             # 団体間に空白行を追加
             st.markdown("<hr style='border: none; height: 20px;'>", unsafe_allow_html=True)
@@ -371,6 +367,7 @@ def genre_selection_page():
     st.header("ジャンルを選択する")
     st.write("ジャンル選択ページの内容をここに追加してください。")
 
+# レビュー投稿ページ
 def review_page(groups):
     st.header("レビューを書く")
 
@@ -483,7 +480,7 @@ def main():
         st.session_state["current_tab"] = "イベント一覧"  # 初期タブを設定
 
     # タブの選択
-    tabs = ["イベント一覧", "ジャンルを選択する", "イベントマップ", "サークルを登録する", "サークル管理者画面", "レビューを書く"]
+    tabs = ["イベント一覧", "ジャンルを選択する", "イベントマップ", "レビューを書く", "サークルを登録する", "サークル管理者画面"]
     selected_tab = st.selectbox("タブを選択してください", tabs, index=tabs.index(st.session_state["current_tab"]))
 
     # タブが変更された場合にリロード
@@ -499,12 +496,12 @@ def main():
         genre_selection_page()
     elif selected_tab == "イベントマップ":
         display_map(groups)
+    elif selected_tab == "レビューを書く":
+        review_page(groups)
     elif selected_tab == "サークルを登録する":
         add_group_form(groups)
     elif selected_tab == "サークル管理者画面":
         admin_panel(groups)
-    elif selected_tab == "レビューを書く":
-        review_page(groups)
 
 if __name__ == "__main__":
     main()
