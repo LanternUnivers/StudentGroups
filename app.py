@@ -272,7 +272,29 @@ def admin_panel(groups):
 
 # メイン関数
 def main():
-    st.title("学生団体イベントアプリ")
+    # タイトルの背景を設定
+    title_bg_style = '''
+    <style>
+    .title-container {
+        font-family: 'Noto Serif JP', sans-serif; /* フォントを設定 */
+        background-color: #333333; /* 暗い背景色 */
+        color: white; /* 文字色を白に設定 */
+        padding: 10px; /* 内側の余白を設定 */
+        border-radius: 5px; /* 角を丸くする */
+        text-align: center; /* 中央揃え */
+        width: 100%; /* 横幅を100%に設定 */
+        margin-bottom: 30px; /* タイトル下に余白を追加 */
+    }
+    .spacer {
+        height: 20px; /* 空白の高さを設定 */
+    }
+    </style>
+    <div class="title-container">
+        <h1>学生団体イベントアプリ</h1>
+    </div>
+    <div class="spacer"></div> <!-- タイトルとタブの間に空白を挿入 -->
+    '''
+    st.markdown(title_bg_style, unsafe_allow_html=True)
 
     # セッションに現在のタブを保存
     if "current_tab" not in st.session_state:
