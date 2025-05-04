@@ -17,6 +17,24 @@
                         "email": "test@example.com"
                     }
                 ]
+            },
+            {
+                "title": "anime",
+                "description": "a",
+                "date": "2025-05-14",
+                "location": "秋葉原",
+                "latitude": 35.7018928,
+                "longitude": 139.7743684,
+                "capacity": 1
+            },
+            {
+                "title": "あ",
+                "description": "test",
+                "date": "2025-08-13",
+                "location": "浅草",
+                "latitude": 35.7175966,
+                "longitude": 139.7975626,
+                "capacity": 1
             }
         ],
         "icon": null

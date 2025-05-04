@@ -5,6 +5,9 @@ import pandas as pd
 from geopy.geocoders import Nominatim
 from PIL import Image
 import bcrypt
+import plotly.express as px
+import calplot
+import matplotlib.pyplot as plt
 
 # 定数
 DATA_FILE = "data/groups.json"
@@ -143,46 +146,6 @@ def add_group_form(groups):
             else:
                 st.error("サークル名とパスワードを入力してください。")
 
-# イベント追加フォーム
-def add_event_form(groups):
-    st.subheader("イベントを追加する")
-    with st.form("add_event_form"):
-        group_name = st.selectbox("団体名", [group["name"] for group in groups] if groups else [])
-        event_title = st.text_input("イベント名")
-        event_date = st.date_input("開催日時")
-        event_location_name = st.text_input("イベントの場所 (地名)", placeholder="例: 東京タワー")
-        event_description = st.text_area("イベント内容")
-        event_capacity = st.number_input("募集人数", min_value=1, step=1)
-        submitted = st.form_submit_button("登録")
-
-        if submitted:
-            if group_name and event_title and event_description and event_date and event_location_name:
-                try:
-                    geolocator = Nominatim(user_agent="student-groups-app")
-                    location = geolocator.geocode(event_location_name)
-                    if location:
-                        lat, lon = location.latitude, location.longitude
-                        for group in groups:
-                            if group["name"] == group_name:
-                                group["events"].append({
-                                    "title": event_title,
-                                    "description": event_description,
-                                    "date": str(event_date),
-                                    "location": event_location_name,
-                                    "latitude": lat,
-                                    "longitude": lon,
-                                    "capacity": event_capacity
-                                })
-                                save_data(groups)
-                                st.success(f"イベント '{event_title}' を団体 '{group_name}' に登録しました！")
-                                break
-                    else:
-                        st.error("指定された地名から緯度・経度を取得できませんでした。正しい地名を入力してください。")
-                except Exception as e:
-                    st.error(f"エラーが発生しました: {e}")
-            else:
-                st.error("すべての項目を入力してください。")
-
 # イベントマップ表示
 def display_map(groups):
     st.header("イベントマップ")
@@ -202,6 +165,51 @@ def display_map(groups):
         st.map(df)
     else:
         st.write("現在、地図に表示できるイベントはありません。")
+
+def display_monthly_calendar(groups):
+    st.header("月間イベントカレンダー")
+
+    # イベントデータを整理
+    events = []
+    for group in groups:
+        if "events" in group and group["events"]:
+            for event in group["events"]:
+                events.append({
+                    "日付": event.get("date", "未設定"),
+                    "イベント名": event["title"],
+                    "団体名": group["name"]
+                })
+
+    # データフレームに変換
+    if events:
+        df = pd.DataFrame(events)
+        df["日付"] = pd.to_datetime(df["日付"], errors="coerce")  # 日付をパース
+        df = df.dropna(subset=["日付"])  # 日付が無効な行を削除
+
+        # 月を選択するセレクトボックス
+        months = df["日付"].dt.to_period("M").unique()
+        selected_month = st.selectbox("表示する月を選択してください", months)
+
+        # 選択された月のデータをフィルタリング
+        filtered_df = df[df["日付"].dt.to_period("M") == selected_month]
+
+        # 日付ごとのイベント数をカウント
+        event_counts = filtered_df.groupby("日付").size()
+
+        # カレンダーを描画
+        fig, ax = calplot.calplot(
+            event_counts,
+            how="sum",
+            cmap="Blues",
+            colorbar=True,
+            figsize=(10, 5),
+            suptitle=f"{selected_month} のイベントカレンダー"
+        )
+
+        # Streamlitに表示
+        st.pyplot(fig)
+    else:
+        st.write("現在、カレンダーに表示できるイベントはありません。")
 
 # 管理者画面
 def admin_panel(groups):
@@ -263,14 +271,47 @@ def admin_panel(groups):
         else:
             st.markdown("- イベントなし")
 
+        # イベント追加フォーム
+        st.subheader("イベントを追加する")
+        with st.form("add_event_form"):
+            event_title = st.text_input("イベント名")
+            event_date = st.date_input("開催日時")
+            event_location_name = st.text_input("イベントの場所 (地名)", placeholder="例: 東京タワー")
+            event_description = st.text_area("イベント内容")
+            event_capacity = st.number_input("募集人数", min_value=1, step=1)
+            submitted = st.form_submit_button("登録")
+
+            if submitted:
+                if event_title and event_description and event_date and event_location_name:
+                    try:
+                        geolocator = Nominatim(user_agent="student-groups-app")
+                        location = geolocator.geocode(event_location_name)
+                        if location:
+                            lat, lon = location.latitude, location.longitude
+                            group["events"].append({
+                                "title": event_title,
+                                "description": event_description,
+                                "date": str(event_date),
+                                "location": event_location_name,
+                                "latitude": lat,
+                                "longitude": lon,
+                                "capacity": event_capacity
+                            })
+                            save_data(groups)
+                            st.success(f"イベント '{event_title}' を団体 '{selected_group}' に登録しました！")
+                        else:
+                            st.error("指定された地名から緯度・経度を取得できませんでした。正しい地名を入力してください。")
+                    except Exception as e:
+                        st.error(f"エラーが発生しました: {e}")
+                else:
+                    st.error("すべての項目を入力してください。")
+
         # ログアウトボタン
         if st.button("ログアウト"):
             st.session_state["authenticated"] = False
             st.session_state["authenticated_group"] = None
             st.rerun()
 
-
-# メイン関数
 def main():
     # タイトルの背景を設定
     title_bg_style = '''
@@ -301,7 +342,7 @@ def main():
         st.session_state["current_tab"] = "イベント一覧"  # 初期タブを設定
 
     # タブの選択
-    tabs = ["イベント一覧", "サークル・イベントを登録する", "イベントマップ", "管理者画面"]
+    tabs = ["イベント一覧", "イベントマップ", "月間イベントカレンダー", "サークルを登録する", "サークル管理者画面"]
     selected_tab = st.selectbox("タブを選択してください", tabs, index=tabs.index(st.session_state["current_tab"]))
 
     # タブが変更された場合にリロード
@@ -313,12 +354,13 @@ def main():
     groups = load_data()
     if selected_tab == "イベント一覧":
         display_event_list(groups)
-    elif selected_tab == "サークル・イベントを登録する":
-        add_group_form(groups)
-        add_event_form(groups)
     elif selected_tab == "イベントマップ":
         display_map(groups)
-    elif selected_tab == "管理者画面":
+    elif selected_tab == "月間イベントカレンダー":
+        display_monthly_calendar(groups)
+    elif selected_tab == "サークルを登録する":
+        add_group_form(groups)
+    elif selected_tab == "サークル管理者画面":
         admin_panel(groups)
 
 if __name__ == "__main__":
