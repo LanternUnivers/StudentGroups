@@ -379,10 +379,33 @@ def admin_panel(groups):
             st.session_state["authenticated_group"] = None
             st.rerun()
 
-# ジャンル選択ページ
+# ジャンル選択ページ(クリックして検索までは実装できなかった)
 def genre_selection_page():
-    st.header("ジャンルを選択する")
-    st.write("ジャンル選択ページの内容をここに追加してください。")
+    st.header("ジャンルを選択してください")
+
+    # ジャンルリスト
+    genres = [
+        {"name": "新歓", "image": "images/shinkan.jpg"},
+        {"name": "勉強会", "image": "images/study.jpeg"},
+        {"name": "交流会", "image": "images/networking.jpg"},
+        {"name": "スポーツ", "image": "images/sports.jpg"},
+        {"name": "ボランティア", "image": "images/volunteer.jpg"},
+        {"name": "ものづくり系", "image": "images/creation.jpeg"},
+        {"name": "旅行", "image": "images/travel.jpg"},
+        {"name": "インターン", "image": "images/internship.jpg"},
+        {"name": "追いコン", "image": "images/farewell.jpg"},
+    ]
+
+    # グリッド形式でジャンルを表示
+    cols = st.columns(3)  # 3列のグリッドを作成
+    for index, genre in enumerate(genres):
+        with cols[index % 3]:  # 各列に順番に配置
+            image_path = genre["image"]
+            if os.path.exists(image_path):  # ファイルが存在するか確認
+                st.image(image_path, caption=genre["name"], use_container_width=True)
+            else:
+                st.error(f"画像が見つかりません: {image_path}")
+
 
 # レビュー投稿ページ
 def review_page(groups):
@@ -497,7 +520,7 @@ def main():
         st.session_state["current_tab"] = "イベント一覧"  # 初期タブを設定
 
     # タブの選択
-    tabs = ["イベント一覧", "ジャンルを選択する", "イベントマップ", "レビューを書く", "サークルを登録する", "サークル管理者画面"]
+    tabs = ["イベント一覧", "ジャンルを選択する", "サークル・イベントを登録する", "イベントマップ", "管理者画面"]
     selected_tab = st.selectbox("タブを選択してください", tabs, index=tabs.index(st.session_state["current_tab"]))
 
     # タブが変更された場合にリロード
@@ -511,13 +534,12 @@ def main():
         display_event_list(groups)
     elif selected_tab == "ジャンルを選択する":
         genre_selection_page()
+    elif selected_tab == "サークル・イベントを登録する":
+        add_group_form(groups)
+        add_event_form(groups)
     elif selected_tab == "イベントマップ":
         display_map(groups)
-    elif selected_tab == "レビューを書く":
-        review_page(groups)
-    elif selected_tab == "サークルを登録する":
-        add_group_form(groups)
-    elif selected_tab == "サークル管理者画面":
+    elif selected_tab == "管理者画面":
         admin_panel(groups)
 
 if __name__ == "__main__":
