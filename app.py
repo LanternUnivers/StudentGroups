@@ -302,15 +302,27 @@ def admin_panel(groups):
                             submitted = st.form_submit_button("保存")
 
                             if submitted:
-                                # 更新処理
-                                event["title"] = new_title
-                                event["date"] = str(new_date)
-                                event["location"] = new_location
-                                event["description"] = new_description
-                                event["capacity"] = new_capacity
-                                save_data(groups)
-                                st.success(f"イベント '{new_title}' を更新しました！")
-                                st.rerun()
+                                try:
+                                    # 新しい場所の座標を取得
+                                    geolocator = Nominatim(user_agent="student-groups-app")
+                                    location = geolocator.geocode(new_location)
+                                    if location:
+                                        lat, lon = location.latitude, location.longitude
+                                        # イベント情報を更新
+                                        event["title"] = new_title
+                                        event["date"] = str(new_date)
+                                        event["location"] = new_location
+                                        event["description"] = new_description
+                                        event["capacity"] = new_capacity
+                                        event["latitude"] = lat
+                                        event["longitude"] = lon
+                                        save_data(groups)
+                                        st.success(f"イベント '{new_title}' を更新しました！")
+                                        st.rerun()
+                                    else:
+                                        st.error("指定された地名から緯度・経度を取得できませんでした。正しい地名を入力してください。")
+                                except Exception as e:
+                                    st.error(f"エラーが発生しました: {e}")
 
             # 削除処理（rerun後）
             if "delete_event" in st.session_state:

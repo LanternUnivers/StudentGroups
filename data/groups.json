@@ -7,9 +7,9 @@
                 "title": "Python勉強会",
                 "description": "Pythonについて勉強しましょう！\n初心者歓迎！",
                 "date": "2025-04-10",
-                "location": "東京大学",
-                "latitude": 35.7091798,
-                "longitude": 139.7197213,
+                "location": "東京駅",
+                "latitude": 35.6815523,
+                "longitude": 139.7680472,
                 "capacity": 30,
                 "category": "勉強会",
                 "applicants": [
@@ -45,16 +45,16 @@
         "icon": "data/icons\\(Test)東京プログラミングサークル.png"
     },
     {
-        "name": "(Test)群馬プログラミングサークル",
+        "name": "(Test)Javaプログラミングサークル",
         "password": "$2b$12$xAHksLBoaOKTqP8I/2HzdO0MHzaC.UNe.gKkqDbOSWMj6LPvxaYTq",
         "events": [
             {
                 "title": "地域の人にプログラミングを教えよう！",
                 "description": "地域の方にJavaをボランティアで教えます！\n一緒に先生として参加しませんか？",
                 "date": "2025-05-31",
-                "location": "群馬県高崎駅",
-                "latitude": 36.298741,
-                "longitude": 139.0783112,
+                "location": "早稲田大学早稲田キャンパス",
+                "latitude": 35.7091798,
+                "longitude": 139.7197213,
                 "capacity": 10,
                 "category": "ボランティア",
                 "applicants": [
