@@ -9,7 +9,7 @@ import bcrypt
 # 定数
 DATA_FILE = "data/groups.json"
 ICON_FOLDER = "data/icons"
-DEFAULT_ICON_URL = "data\icons\default_icon.png"
+DEFAULT_ICON_URL = "data/icons/default_icon.png"
 
 # データ操作関連
 def load_data():
@@ -385,15 +385,15 @@ def genre_selection_page():
 
     # ジャンルリスト
     genres = [
-        {"name": "新歓", "image": "images/shinkan.jpg"},
-        {"name": "勉強会", "image": "images/study.jpeg"},
-        {"name": "交流会", "image": "images/networking.jpg"},
-        {"name": "スポーツ", "image": "images/sports.jpg"},
-        {"name": "ボランティア", "image": "images/volunteer.jpg"},
-        {"name": "ものづくり系", "image": "images/creation.jpeg"},
-        {"name": "旅行", "image": "images/travel.jpg"},
-        {"name": "インターン", "image": "images/internship.jpg"},
-        {"name": "追いコン", "image": "images/farewell.jpg"},
+        {"name": "新歓", "image": "data/images/shinkan.jpg"},
+        {"name": "勉強会", "image": "data/images/study.jpeg"},
+        {"name": "交流会", "image": "data/images/networking.jpg"},
+        {"name": "スポーツ", "image": "data/images/sports.jpg"},
+        {"name": "ボランティア", "image": "data/images/volunteer.jpg"},
+        {"name": "ものづくり系", "image": "data/images/creation.jpeg"},
+        {"name": "旅行", "image": "data/images/travel.jpg"},
+        {"name": "インターン", "image": "data/images/internship.jpg"},
+        {"name": "追いコン", "image": "data/images/farewell.jpg"},
     ]
 
     # グリッド形式でジャンルを表示
@@ -520,7 +520,7 @@ def main():
         st.session_state["current_tab"] = "イベント一覧"  # 初期タブを設定
 
     # タブの選択
-    tabs = ["イベント一覧", "ジャンルを選択する", "サークル・イベントを登録する", "イベントマップ", "管理者画面"]
+    tabs = ["イベント一覧", "ジャンルを選択する", "イベントマップ", "レビューを書く", "サークルを登録する", "サークル管理者画面"]
     selected_tab = st.selectbox("タブを選択してください", tabs, index=tabs.index(st.session_state["current_tab"]))
 
     # タブが変更された場合にリロード
@@ -534,12 +534,13 @@ def main():
         display_event_list(groups)
     elif selected_tab == "ジャンルを選択する":
         genre_selection_page()
-    elif selected_tab == "サークル・イベントを登録する":
-        add_group_form(groups)
-        add_event_form(groups)
     elif selected_tab == "イベントマップ":
         display_map(groups)
-    elif selected_tab == "管理者画面":
+    elif selected_tab == "レビューを書く":
+        review_page(groups)
+    elif selected_tab == "サークルを登録する":
+        add_group_form(groups)
+    elif selected_tab == "サークル管理者画面":
         admin_panel(groups)
 
 if __name__ == "__main__":
