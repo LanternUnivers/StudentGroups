@@ -4,67 +4,6 @@
         "password": "$2b$12$I4SloDDs5rCNB.ipFNvZ5O9.4ZBirErqmld3mLdBYgT2MuibxVhKW",
         "events": [
             {
-                "title": "hoge",
-                "description": "ほあ",
-                "date": "2025-05-15",
-                "location": "東京タワー",
-                "latitude": 35.6584491,
-                "longitude": 139.745536,
-                "capacity": 1,
-                "applicants": [
-                    {
-                        "name": "test",
-                        "email": "test@example.com"
-                    },
-                    {
-                        "name": "小林",
-                        "email": "example@example.com"
-                    },
-                    {
-                        "name": "a",
-                        "email": "a@a.com"
-                    },
-                    {
-                        "name": "b",
-                        "email": "a@a.com"
-                    },
-                    {
-                        "name": "Tyo",
-                        "email": "a@a.com"
-                    },
-                    {
-                        "name": "Tyo",
-                        "email": "b@a.com"
-                    },
-                    {
-                        "name": "a",
-                        "email": "t@t.com"
-                    },
-                    {
-                        "name": "あ",
-                        "email": "build@build.com"
-                    },
-                    {
-                        "name": "Tyo",
-                        "email": "tyo@tyo.com"
-                    }
-                ],
-                "reviews": [
-                    {
-                        "name": "b",
-                        "email": "a@a.com",
-                        "satisfaction": 3,
-                        "feedback": "a"
-                    },
-                    {
-                        "name": "test",
-                        "email": "test@example.com",
-                        "satisfaction": 2,
-                        "feedback": "a"
-                    }
-                ]
-            },
-            {
                 "title": "a",
                 "description": "あ",
                 "date": "2025-05-04",
@@ -77,6 +16,18 @@
                     {
                         "name": "test",
                         "email": "test@example.com"
+                    },
+                    {
+                        "name": "a",
+                        "email": "a@a.com"
+                    },
+                    {
+                        "name": "b",
+                        "email": "b@a.com"
+                    },
+                    {
+                        "name": "c",
+                        "email": "c@a.com"
                     }
                 ],
                 "reviews": [
@@ -85,8 +36,30 @@
                         "email": "test@example.com",
                         "satisfaction": 2,
                         "feedback": "a"
+                    },
+                    {
+                        "name": "a",
+                        "email": "a@a.com",
+                        "satisfaction": 5,
+                        "feedback": "good!!!"
+                    },
+                    {
+                        "name": "b",
+                        "email": "b@a.com",
+                        "satisfaction": 1,
+                        "feedback": "bad"
                     }
                 ]
+            },
+            {
+                "title": "test",
+                "description": "testetst",
+                "date": "2025-05-15",
+                "location": "東京駅",
+                "latitude": 35.6820513,
+                "longitude": 139.7658294,
+                "capacity": 10,
+                "category": "勉強会"
             }
         ],
         "icon": null

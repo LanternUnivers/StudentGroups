@@ -62,15 +62,19 @@ def display_event_list(groups):
                 group_copy["events"] = filtered_events
                 filtered_groups.append(group_copy)
 
-    # イベント表示（既存のコードを再利用）
+    # イベント表示
     if filtered_groups:
         for group_index, group in enumerate(filtered_groups):
             col1, col2 = st.columns([1, 9])
             with col1:
-                icon_path = group.get("icon") or DEFAULT_ICON_URL
-                st.image(icon_path, width=50)
+                icon_path = group.get("icon") or "data/icons/default_icon.png"
+                st.image(icon_path, width=40)
             with col2:
-                st.markdown(f"## {group['name']}")
+                st.markdown(
+                    f"<h3 style='font-size: 30px;'>{group['name']}</h3>", 
+                    unsafe_allow_html=True
+                )
+
             if "events" in group and group["events"]:
                 for event_index, event in enumerate(group["events"]):
                     # セッション状態の初期化
@@ -123,15 +127,16 @@ def display_event_list(groups):
 
                     # レビュー表示
                     if "reviews" in event:
-                        st.subheader("✒️レビュー")
+                        st.markdown(
+                            "<h4 style='font-size: 18px;'>✒️レビュー</h4>",
+                            unsafe_allow_html=True
+                            )
                         for review in event["reviews"]:
                             st.markdown(
                                 f"""
                                 <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #ffffe0;">
-                                    <strong>【満足度】</strong> 
-                                    <p>⭐{review['satisfaction']} / ⭐5</p>
-                                    <strong>【感想】</strong>
-                                    <p>{review['feedback']}</p>
+                                    <strong>【満足度】</strong> ⭐{review['satisfaction']} / ⭐5 <br>
+                                    <strong>【感想】</strong> {review['feedback']}
                                 </div>
                                 """,
                                 unsafe_allow_html=True
