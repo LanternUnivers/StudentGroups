@@ -196,26 +196,54 @@ def admin_panel(groups):
         selected_group = st.session_state["authenticated_group"]
         group = next((g for g in groups if g["name"] == selected_group), None)
         st.success(f"サークル '{selected_group}' の管理画面にアクセス中")
-        st.subheader("登録済みのイベント")
 
+        # イベント一覧セクション
+        st.subheader("登録済みのイベント")
         if group and "events" in group and group["events"]:
             for event_index, event in enumerate(group["events"]):
-                st.markdown(f"### イベント名: {event['title']}")
+                with st.container():
+                    st.markdown(f"### 🎯 イベント名: {event['title']}")
+                    st.markdown(f"- 📅 開催日時: {event.get('date', '未設定')}")
+                    st.markdown(f"- 📍 場所: {event.get('location', '未設定')}")
+                    st.markdown(f"- 📝 内容: {event.get('description', '未設定')}")
+                    st.markdown(f"- 📊 募集人数: {event.get('capacity', '未設定')}")
 
-                if "applicants" in event and event["applicants"]:
-                    st.markdown("#### 応募者リスト:")
-                    for applicant in event["applicants"]:
-                        st.markdown(f"- 名前: {applicant['name']}, メール: {applicant['email']}")
-                else:
-                    st.markdown("- 応募者なし")
+                    # 応募者リスト
+                    if "applicants" in event and event["applicants"]:
+                        st.markdown("#### 応募者リスト:")
+                        for applicant in event["applicants"]:
+                            st.markdown(f"- 名前: {applicant['name']}, メール: {applicant['email']}")
+                    else:
+                        st.markdown("- 応募者なし")
 
-                delete_button_key = f"delete_{group['name']}_{event_index}"
-                if st.button(f"イベントを削除 ({event['title']})", key=delete_button_key):
-                    st.session_state["delete_event"] = {
-                        "group_name": group["name"],
-                        "event_index": event_index
-                    }
-                    st.rerun()
+                    # 操作ボタンを縦に配置
+                    if st.button(f"イベントを削除 ({event['title']})", key=f"delete_{group['name']}_{event_index}"):
+                        st.session_state["delete_event"] = {
+                            "group_name": group["name"],
+                            "event_index": event_index
+                        }
+                        st.rerun()
+
+                    # 編集フォームを展開するための expander
+                    with st.expander(f"編集 ({event['title']})"):
+                        with st.form(f"edit_event_form_{event_index}"):
+                            new_title = st.text_input("イベント名", value=event["title"])
+                            new_date = st.date_input("開催日時", value=pd.to_datetime(event["date"]))
+                            new_location = st.text_input("イベントの場所", value=event.get("location", ""))
+                            new_description = st.text_area("イベント内容", value=event.get("description", ""))
+                            new_capacity = st.number_input("募集人数", min_value=1, step=1, value=event.get("capacity", 1))
+                            submitted = st.form_submit_button("保存")
+
+                            if submitted:
+                                # 更新処理
+                                event["title"] = new_title
+                                event["date"] = str(new_date)
+                                event["location"] = new_location
+                                event["description"] = new_description
+                                event["capacity"] = new_capacity
+                                save_data(groups)
+                                st.success(f"イベント '{new_title}' を更新しました！")
+                                st.rerun()
 
             # 削除処理（rerun後）
             if "delete_event" in st.session_state:
@@ -229,7 +257,7 @@ def admin_panel(groups):
         else:
             st.markdown("- イベントなし")
 
-        # イベント追加フォーム
+        # イベント追加セクション
         st.subheader("イベントを追加する")
         with st.form("add_event_form"):
             event_title = st.text_input("イベント名")

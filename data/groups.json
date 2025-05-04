@@ -4,28 +4,13 @@
         "password": "$2b$12$I4SloDDs5rCNB.ipFNvZ5O9.4ZBirErqmld3mLdBYgT2MuibxVhKW",
         "events": [
             {
-                "title": "hoge",
-                "description": "ほあ",
-                "date": "2025-05-15",
-                "location": "東京タワー",
-                "latitude": 35.6584491,
-                "longitude": 139.745536,
-                "capacity": 1,
-                "applicants": [
-                    {
-                        "name": "test",
-                        "email": "test@example.com"
-                    }
-                ]
-            },
-            {
                 "title": "anime",
                 "description": "a",
                 "date": "2025-05-14",
                 "location": "秋葉原",
                 "latitude": 35.7018928,
                 "longitude": 139.7743684,
-                "capacity": 1
+                "capacity": 8
             },
             {
                 "title": "あ",
