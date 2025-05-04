@@ -1,67 +1,87 @@
 [
     {
-        "name": "hashtest",
-        "password": "$2b$12$I4SloDDs5rCNB.ipFNvZ5O9.4ZBirErqmld3mLdBYgT2MuibxVhKW",
+        "name": "(Test)東京プログラミングサークル",
+        "password": "$2b$12$I1sT.Uo6Vz06N8RKsCGZaOugNJfZmHHx..uWqRvBPuyxFUHdB5DHW",
         "events": [
             {
-                "title": "a",
-                "description": "あ",
-                "date": "2025-05-04",
-                "location": "あべのハルカス",
-                "latitude": 34.6459232,
-                "longitude": 135.5139658,
-                "capacity": 1,
-                "category": "新歓",
+                "title": "Python勉強会",
+                "description": "Pythonについて勉強しましょう！\n初心者歓迎！",
+                "date": "2025-04-10",
+                "location": "東京大学",
+                "latitude": 35.7091798,
+                "longitude": 139.7197213,
+                "capacity": 30,
+                "category": "勉強会",
                 "applicants": [
                     {
-                        "name": "test",
-                        "email": "test@example.com"
+                        "name": "Taro",
+                        "email": "Taro@example.com"
                     },
                     {
-                        "name": "a",
-                        "email": "a@a.com"
+                        "name": "Cat",
+                        "email": "Cat@example.com"
                     },
                     {
-                        "name": "b",
-                        "email": "b@a.com"
-                    },
-                    {
-                        "name": "c",
-                        "email": "c@a.com"
+                        "name": "Dog",
+                        "email": "Dog@example.com"
                     }
                 ],
                 "reviews": [
                     {
-                        "name": "test",
-                        "email": "test@example.com",
-                        "satisfaction": 2,
-                        "feedback": "a"
-                    },
-                    {
-                        "name": "a",
-                        "email": "a@a.com",
+                        "name": "Taro",
+                        "email": "Taro@example.com",
                         "satisfaction": 5,
-                        "feedback": "good!!!"
+                        "feedback": "とてもよかった！！"
                     },
                     {
-                        "name": "b",
-                        "email": "b@a.com",
-                        "satisfaction": 1,
-                        "feedback": "bad"
+                        "name": "Cat",
+                        "email": "Cat@example.com",
+                        "satisfaction": 3,
+                        "feedback": "普通"
                     }
                 ]
-            },
-            {
-                "title": "test",
-                "description": "testetst",
-                "date": "2025-05-15",
-                "location": "東京駅",
-                "latitude": 35.6820513,
-                "longitude": 139.7658294,
-                "capacity": 10,
-                "category": "勉強会"
             }
         ],
-        "icon": null
+        "icon": "data/icons\\(Test)東京プログラミングサークル.png"
+    },
+    {
+        "name": "(Test)群馬プログラミングサークル",
+        "password": "$2b$12$xAHksLBoaOKTqP8I/2HzdO0MHzaC.UNe.gKkqDbOSWMj6LPvxaYTq",
+        "events": [
+            {
+                "title": "地域の人にプログラミングを教えよう！",
+                "description": "地域の方にJavaをボランティアで教えます！\n一緒に先生として参加しませんか？",
+                "date": "2025-05-31",
+                "location": "群馬県高崎駅",
+                "latitude": 36.298741,
+                "longitude": 139.0783112,
+                "capacity": 10,
+                "category": "ボランティア",
+                "applicants": [
+                    {
+                        "name": "Cat",
+                        "email": "Cat@example.com"
+                    }
+                ]
+            }
+        ],
+        "icon": "data/icons\\(Test)群馬プログラミングサークル.png"
+    },
+    {
+        "name": "(Test)サッカーサークル",
+        "password": "$2b$12$rInCTtRGbo7NQSGag8oHYuFibgFIv2HF8glkemtXH24exCOS0IfNu",
+        "events": [
+            {
+                "title": "新歓やります！",
+                "description": "サッカーサークルに入りませんか？\n新歓やります！",
+                "date": "2025-05-25",
+                "location": "渋谷",
+                "latitude": 35.658999,
+                "longitude": 139.7024447,
+                "capacity": 100,
+                "category": "新歓"
+            }
+        ],
+        "icon": "data/icons\\(Test)サッカーサークル.png"
     }
 ]

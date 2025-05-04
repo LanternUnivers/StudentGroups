@@ -85,9 +85,9 @@ def display_event_list(groups):
                     # イベント情報の表示
                     st.markdown(
                         f"""
-                        <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #808080; color: white;">
-                            <h4 style="color: #ffffff;">🎯 イベント名: {event['title']}</h4>
-                            <p><strong>📍 場所:</strong> <a href="#" id="location_{group_index}_{event_index}" style="color: #00c0ff; text-decoration: underline;" onclick="window.showMap('{map_key}')">{event.get('location', '未設定')}</a></p>
+                        <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #f0f8ff; color: #333;">
+                            <h4 style="color: #333;">🎯 イベント名: {event['title']}</h4>
+                            <p><strong>📍 場所:</strong> <a href="#" id="location_{group_index}_{event_index}" style="color: #007acc; text-decoration: underline;" onclick="window.showMap('{map_key}')">{event.get('location', '未設定')}</a></p>
                             <p><strong>📅 日時:</strong> {event.get('date', '未設定')}</p>
                             <p><strong>📝 イベント内容:</strong> {event.get('description', '未設定')}</p>
                             <p><strong>📊 募集人数:</strong> {event.get('capacity', '未設定')}</p>
@@ -142,10 +142,10 @@ def display_event_list(groups):
                                 unsafe_allow_html=True
                             )
                         # レビューの後に空白を挿入
-                        st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
+                        st.markdown("<div style='height: 5px;'></div>", unsafe_allow_html=True)
 
             # 団体間に空白行を追加
-            st.markdown("<hr style='border: none; height: 20px;'>", unsafe_allow_html=True)
+            st.markdown("<hr style='border: none; height: 5px;'>", unsafe_allow_html=True)
     else:
         st.markdown("<p style='color: gray;'>該当するイベントが見つかりません。</p>", unsafe_allow_html=True)
 
@@ -460,9 +460,8 @@ def main():
     title_bg_style = '''
     <style>
     .title-container {
-        font-family: 'Noto Serif JP', sans-serif; /* フォントを設定 */
+        font-family: 'Arial', sans-serif; /* フォントを設定 */
         background-color: #008080; /* 暗い背景色 */
-        color: white; /* 文字色設定 */
         padding: 10px; /* 内側の余白を設定 */
         border-radius: 5px; /* 角を丸くする */
         text-align: center; /* 中央揃え */
@@ -474,7 +473,8 @@ def main():
     }
     </style>
     <div class="title-container">
-        <h1>Rally</h1>
+        <h1 style="color: #ffffff;">Rally</h1>
+        <p style="color: #ffffff;">ー サークル・学生団体と学生を繋ぐ ー</p>
     </div>
     <div class="spacer"></div> <!-- タイトルとタブの間に空白を挿入 -->
     '''
