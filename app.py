@@ -68,6 +68,10 @@ def display_event_list(groups):
             col1, col2 = st.columns([1, 9])
             with col1:
                 icon_path = group.get("icon") or "data/icons/default_icon.png"
+                if not os.path.exists(icon_path):
+                    st.warning(f"画像が見つかりません: {icon_path}。デフォルト画像を使用します。")
+                    icon_path = "data/icons/default_icon.png"  # デフォルト画像を使用
+
                 st.image(icon_path, width=40)
             with col2:
                 st.markdown(
