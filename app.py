@@ -114,16 +114,14 @@ def display_event_list(groups):
                                     st.error("名前とメールアドレスを入力してください。")
 
                     # 地図の表示
+                    show_map = st.checkbox("地図を見る", key=f"map_checkbox_{group_index}_{event_index}", value=st.session_state.get(map_key, False))
+                    st.session_state[map_key] = show_map
+
                     if st.session_state[map_key]:
                         st.map(pd.DataFrame([{
                             "lat": event["latitude"],
                             "lon": event["longitude"]
                         }]))
-                        if st.button("地図を閉じる", key=f"close_map_{group_index}_{event_index}"):
-                            st.session_state[map_key] = False
-                    else:
-                        if st.button("地図を見る", key=f"open_map_{group_index}_{event_index}"):
-                            st.session_state[map_key] = True
 
                     # レビュー表示
                     if "reviews" in event:
