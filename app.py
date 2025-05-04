@@ -98,6 +98,22 @@ def display_event_list(groups):
                         """,
                         unsafe_allow_html=True
                     )
+                    # 応募フォームを展開するボタン
+                    with st.expander("応募する"):
+                        form_key = f"apply_form_{group_index}_{event_index}"  # インデックスを含めたキー
+                        with st.form(form_key):
+                            name = st.text_input("名前を入力してください", key=f"name_{group_index}_{event_index}")
+                            email = st.text_input("メールアドレスを入力してください", key=f"email_{group_index}_{event_index}")
+                            submitted = st.form_submit_button("送信")
+                            if submitted:
+                                if name and email:
+                                    if "applicants" not in event:
+                                        event["applicants"] = []
+                                    event["applicants"].append({"name": name, "email": email})
+                                    save_data(groups)
+                                    st.success(f"{name} さんがイベント '{event['title']}' に応募しました！")
+                                else:
+                                    st.error("名前とメールアドレスを入力してください。")
 
                     # 地図の表示
                     if st.session_state[map_key]:
@@ -110,25 +126,6 @@ def display_event_list(groups):
                     else:
                         if st.button("地図を見る", key=f"open_map_{group_index}_{event_index}"):
                             st.session_state[map_key] = True
-
-                    # レビュー投稿フォーム
-                    if "applicants" in event and any(applicant["email"] == email for applicant in event["applicants"]):
-                        # すでにレビューを投稿したか確認
-                        if "reviews" in event and any(review.get("email") == email for review in event["reviews"]):
-                            st.info("このイベントにはすでにレビューを投稿済みです。")
-                        else:
-                            st.subheader("レビューを書く")
-                            with st.form(f"review_form_{group_index}_{event_index}"):
-                                satisfaction = st.slider("満足度 (⭐1-⭐5)", 1, 5, key=f"satisfaction_{group_index}_{event_index}")
-                                feedback = st.text_area("感想", key=f"feedback_{group_index}_{event_index}")
-                                review_submitted = st.form_submit_button("レビューを送信")
-                                if review_submitted:
-                                    if "reviews" not in event:
-                                        event["reviews"] = []
-                                    # レビューに email を含めて保存
-                                    event["reviews"].append({"email": email, "satisfaction": satisfaction, "feedback": feedback})
-                                    save_data(groups)
-                                    st.success("レビューを送信しました！")
 
                     # レビュー表示
                     if "reviews" in event:
@@ -146,8 +143,8 @@ def display_event_list(groups):
                                 unsafe_allow_html=True
                             )
 
-            else:
-                st.markdown("<p style='color: gray;'>現在、この団体には登録されたイベントがありません。</p>", unsafe_allow_html=True)
+            # 団体間に空白行を追加
+            st.markdown("<hr style='border: none; height: 20px;'>", unsafe_allow_html=True)
     else:
         st.markdown("<p style='color: gray;'>該当するイベントが見つかりません。</p>", unsafe_allow_html=True)
 
@@ -374,6 +371,87 @@ def genre_selection_page():
     st.header("ジャンルを選択する")
     st.write("ジャンル選択ページの内容をここに追加してください。")
 
+def review_page(groups):
+    st.header("レビューを書く")
+
+    # イベント選択
+    event_options = [
+        (group["name"], event["title"])
+        for group in groups if "events" in group and group["events"]
+        for event in group["events"]
+    ]
+    if not event_options:
+        st.info("現在、レビュー可能なイベントはありません。")
+        return
+
+    selected_event = st.selectbox(
+        "レビューするイベントを選択してください",
+        options=event_options,
+        format_func=lambda x: f"{x[0]} - {x[1]}"
+    )
+
+    # ユーザー入力
+    st.subheader("ユーザー認証")
+    user_name = st.text_input("名前を入力してください")
+    user_email = st.text_input("メールアドレスを入力してください")
+
+    # 認証処理（最初に一回だけ）
+    if "auth_success" not in st.session_state:
+        st.session_state.auth_success = False
+
+    if st.button("認証"):
+        group_name, event_title = selected_event
+        group_index = next((i for i, g in enumerate(groups) if g["name"] == group_name), None)
+
+        if group_index is not None:
+            event_index = next((j for j, e in enumerate(groups[group_index]["events"]) if e["title"] == event_title), None)
+
+            if event_index is not None:
+                event = groups[group_index]["events"][event_index]
+                if "applicants" in event and any(app["email"] == user_email and app["name"] == user_name for app in event["applicants"]):
+                    st.session_state.auth_success = True
+                    st.session_state.group_index = group_index
+                    st.session_state.event_index = event_index
+                    st.session_state.user_name = user_name
+                    st.session_state.user_email = user_email
+                    st.success("認証に成功しました！")
+                else:
+                    st.error("応募者リストに存在しません。正しい名前とメールアドレスを入力してください。")
+            else:
+                st.error("イベントが見つかりません。")
+        else:
+            st.error("グループが見つかりません。")
+
+    # 認証後のレビュー投稿画面
+    if st.session_state.get("auth_success"):
+        group_index = st.session_state.group_index
+        event_index = st.session_state.event_index
+        event = groups[group_index]["events"][event_index]
+        user_email = st.session_state.user_email
+        user_name = st.session_state.user_name
+
+        if "reviews" in event and any(review["email"] == user_email for review in event["reviews"]):
+            st.info("このイベントにはすでにレビューを投稿済みです。")
+        else:
+            st.subheader("レビューを書く")
+            with st.form(f"review_form_{group_index}_{event_index}"):
+                satisfaction = st.slider("満足度 (⭐1-⭐5)", 1, 5)
+                feedback = st.text_area("感想")
+                review_submitted = st.form_submit_button("レビューを送信")
+                if review_submitted:
+                    if "reviews" not in groups[group_index]["events"][event_index]:
+                        groups[group_index]["events"][event_index]["reviews"] = []
+
+                    groups[group_index]["events"][event_index]["reviews"].append({
+                        "name": user_name,
+                        "email": user_email,
+                        "satisfaction": satisfaction,
+                        "feedback": feedback
+                    })
+                    save_data(groups)
+                    st.success("レビューを送信しました！")
+                    st.session_state.auth_success = False  # 認証セッションを終了
+
 # メイン関数
 def main():
     # タイトルの背景を設定
@@ -405,7 +483,7 @@ def main():
         st.session_state["current_tab"] = "イベント一覧"  # 初期タブを設定
 
     # タブの選択
-    tabs = ["イベント一覧", "ジャンルを選択する", "イベントマップ", "サークルを登録する", "サークル管理者画面"]
+    tabs = ["イベント一覧", "ジャンルを選択する", "イベントマップ", "サークルを登録する", "サークル管理者画面", "レビューを書く"]
     selected_tab = st.selectbox("タブを選択してください", tabs, index=tabs.index(st.session_state["current_tab"]))
 
     # タブが変更された場合にリロード
@@ -425,6 +503,8 @@ def main():
         add_group_form(groups)
     elif selected_tab == "サークル管理者画面":
         admin_panel(groups)
+    elif selected_tab == "レビューを書く":
+        review_page(groups)
 
 if __name__ == "__main__":
     main()

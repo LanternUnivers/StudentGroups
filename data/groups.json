@@ -53,24 +53,30 @@
                     {
                         "satisfaction": 3,
                         "feedback": "普通"
-                    },
+                    }
+                ]
+            },
+            {
+                "title": "a",
+                "description": "あ",
+                "date": "2025-05-04",
+                "location": "あべのハルカス",
+                "latitude": 34.6459232,
+                "longitude": 135.5139658,
+                "capacity": 1,
+                "category": "新歓",
+                "applicants": [
                     {
+                        "name": "test",
+                        "email": "test@example.com"
+                    }
+                ],
+                "reviews": [
+                    {
+                        "name": "test",
+                        "email": "test@example.com",
                         "satisfaction": 2,
                         "feedback": "a"
-                    },
-                    {
-                        "satisfaction": 2,
-                        "feedback": "a"
-                    },
-                    {
-                        "email": "build@build.com",
-                        "satisfaction": 2,
-                        "feedback": "あ"
-                    },
-                    {
-                        "email": "tyo@tyo.com",
-                        "satisfaction": 3,
-                        "feedback": "なかなか良かった\n次も参加したい"
                     }
                 ]
             }
