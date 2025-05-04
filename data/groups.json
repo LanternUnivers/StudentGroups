@@ -4,31 +4,75 @@
         "password": "$2b$12$I4SloDDs5rCNB.ipFNvZ5O9.4ZBirErqmld3mLdBYgT2MuibxVhKW",
         "events": [
             {
-                "title": "anime",
-                "description": "a",
-                "date": "2025-05-14",
-                "location": "秋葉原",
-                "latitude": 35.7018928,
-                "longitude": 139.7743684,
-                "capacity": 8
-            },
-            {
-                "title": "あ",
-                "description": "test",
-                "date": "2025-08-13",
-                "location": "浅草",
-                "latitude": 35.7175966,
-                "longitude": 139.7975626,
-                "capacity": 1
-            },
-            {
-                "title": "testtest",
-                "description": "A",
-                "date": "2025-05-04",
-                "location": "東京駅",
-                "latitude": 35.6820513,
-                "longitude": 139.7658294,
-                "capacity": 1
+                "title": "hoge",
+                "description": "ほあ",
+                "date": "2025-05-15",
+                "location": "東京タワー",
+                "latitude": 35.6584491,
+                "longitude": 139.745536,
+                "capacity": 1,
+                "applicants": [
+                    {
+                        "name": "test",
+                        "email": "test@example.com"
+                    },
+                    {
+                        "name": "小林",
+                        "email": "example@example.com"
+                    },
+                    {
+                        "name": "a",
+                        "email": "a@a.com"
+                    },
+                    {
+                        "name": "b",
+                        "email": "a@a.com"
+                    },
+                    {
+                        "name": "Tyo",
+                        "email": "a@a.com"
+                    },
+                    {
+                        "name": "Tyo",
+                        "email": "b@a.com"
+                    },
+                    {
+                        "name": "a",
+                        "email": "t@t.com"
+                    },
+                    {
+                        "name": "あ",
+                        "email": "build@build.com"
+                    },
+                    {
+                        "name": "Tyo",
+                        "email": "tyo@tyo.com"
+                    }
+                ],
+                "reviews": [
+                    {
+                        "satisfaction": 3,
+                        "feedback": "普通"
+                    },
+                    {
+                        "satisfaction": 2,
+                        "feedback": "a"
+                    },
+                    {
+                        "satisfaction": 2,
+                        "feedback": "a"
+                    },
+                    {
+                        "email": "build@build.com",
+                        "satisfaction": 2,
+                        "feedback": "あ"
+                    },
+                    {
+                        "email": "tyo@tyo.com",
+                        "satisfaction": 3,
+                        "feedback": "なかなか良かった\n次も参加したい"
+                    }
+                ]
             }
         ],
         "icon": null

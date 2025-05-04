@@ -115,6 +115,42 @@ def display_event_list(groups):
                                     st.success(f"{name} さんがイベント '{event['title']}' に応募しました！")
                                 else:
                                     st.error("名前とメールアドレスを入力してください。")
+
+                    # レビュー投稿フォーム
+                    if "applicants" in event and any(applicant["email"] == email for applicant in event["applicants"]):
+                        # すでにレビューを投稿したか確認
+                        if "reviews" in event and any(review.get("email") == email for review in event["reviews"]):
+                            st.info("このイベントにはすでにレビューを投稿済みです。")
+                        else:
+                            st.subheader("レビューを書く")
+                            with st.form(f"review_form_{group_index}_{event_index}"):
+                                satisfaction = st.slider("満足度 (⭐1-⭐5)", 1, 5, key=f"satisfaction_{group_index}_{event_index}")
+                                feedback = st.text_area("感想", key=f"feedback_{group_index}_{event_index}")
+                                review_submitted = st.form_submit_button("レビューを送信")
+                                if review_submitted:
+                                    if "reviews" not in event:
+                                        event["reviews"] = []
+                                    # レビューに email を含めて保存
+                                    event["reviews"].append({"email": email, "satisfaction": satisfaction, "feedback": feedback})
+                                    save_data(groups)
+                                    st.success("レビューを送信しました！")
+
+                    # レビュー表示
+                    if "reviews" in event:
+                        st.subheader("✒️レビュー")
+                        for review in event["reviews"]:
+                            st.markdown(
+                                f"""
+                                <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; background-color: #003366;">
+                                    <strong>【満足度】</strong> 
+                                    <p>⭐{review['satisfaction']} / ⭐5</p>
+                                    <strong>【感想】</strong>
+                                    <p>{review['feedback']}</p>
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
+
             else:
                 st.markdown("<p style='color: gray;'>現在、この団体には登録されたイベントがありません。</p>", unsafe_allow_html=True)
             
@@ -304,8 +340,8 @@ def main():
     <style>
     .title-container {
         font-family: 'Noto Serif JP', sans-serif; /* フォントを設定 */
-        background-color: #333333; /* 暗い背景色 */
-        color: white; /* 文字色を白に設定 */
+        background-color: #008080; /* 暗い背景色 */
+        color: white; /* 文字色設定 */
         padding: 10px; /* 内側の余白を設定 */
         border-radius: 5px; /* 角を丸くする */
         text-align: center; /* 中央揃え */
@@ -317,7 +353,7 @@ def main():
     }
     </style>
     <div class="title-container">
-        <h1>学生団体イベントアプリ</h1>
+        <h1>Rally</h1>
     </div>
     <div class="spacer"></div> <!-- タイトルとタブの間に空白を挿入 -->
     '''
