@@ -9,7 +9,7 @@ import bcrypt
 # 定数
 DATA_FILE = "data/groups.json"
 ICON_FOLDER = "data/icons"
-DEFAULT_ICON_URL = "data\icons\default_icon.png"
+DEFAULT_ICON_URL = "data/icons/default_icon.png"
 
 # データ操作関連
 def load_data():
@@ -379,10 +379,33 @@ def admin_panel(groups):
             st.session_state["authenticated_group"] = None
             st.rerun()
 
-# ジャンル選択ページ
+# ジャンル選択ページ(クリックして検索までは実装できなかった)
 def genre_selection_page():
-    st.header("ジャンルを選択する")
-    st.write("ジャンル選択ページの内容をここに追加してください。")
+    st.header("ジャンルを選択してください")
+
+    # ジャンルリスト
+    genres = [
+        {"name": "新歓", "image": "data/images/shinkan.jpg"},
+        {"name": "勉強会", "image": "data/images/study.jpeg"},
+        {"name": "交流会", "image": "data/images/networking.jpg"},
+        {"name": "スポーツ", "image": "data/images/sports.jpg"},
+        {"name": "ボランティア", "image": "data/images/volunteer.jpg"},
+        {"name": "ものづくり系", "image": "data/images/creation.jpeg"},
+        {"name": "旅行", "image": "data/images/travel.jpg"},
+        {"name": "インターン", "image": "data/images/internship.jpg"},
+        {"name": "追いコン", "image": "data/images/farewell.jpg"},
+    ]
+
+    # グリッド形式でジャンルを表示
+    cols = st.columns(3)  # 3列のグリッドを作成
+    for index, genre in enumerate(genres):
+        with cols[index % 3]:  # 各列に順番に配置
+            image_path = genre["image"]
+            if os.path.exists(image_path):  # ファイルが存在するか確認
+                st.image(image_path, caption=genre["name"], use_container_width=True)
+            else:
+                st.error(f"画像が見つかりません: {image_path}")
+
 
 # レビュー投稿ページ
 def review_page(groups):
