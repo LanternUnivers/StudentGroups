@@ -37,7 +37,7 @@ def hash_password(password):
 def check_password(password, hashed):
     return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
 
-# イベント一覧表示（応募機能付き）
+# イベント一覧表示
 def display_event_list(groups):
     st.header("イベント一覧")
 
@@ -66,14 +66,14 @@ def display_event_list(groups):
     if filtered_groups:
         for group_index, group in enumerate(filtered_groups):
             col1, col2 = st.columns([1, 9])
-            with col1:
+            with col1: # 団体のアイコンを表示
                 icon_path = group.get("icon") or "data/icons/default_icon.png"
                 if not os.path.exists(icon_path):
                     st.warning(f"画像が見つかりません: {icon_path}。デフォルト画像を使用します。")
                     icon_path = "data/icons/default_icon.png"  # デフォルト画像を使用
 
                 st.image(icon_path, width=40)
-            with col2:
+            with col2: # 団体名を表示
                 st.markdown(
                     f"<h3 style='font-size: 30px;'>{group['name']}</h3>", 
                     unsafe_allow_html=True
@@ -108,7 +108,7 @@ def display_event_list(groups):
                             email = st.text_input("メールアドレスを入力してください", key=f"email_{group_index}_{event_index}")
                             submitted = st.form_submit_button("送信")
                             if submitted:
-                                if name and email:
+                                if name and email: #応募機能
                                     if "applicants" not in event:
                                         event["applicants"] = []
                                     event["applicants"].append({"name": name, "email": email})
@@ -192,6 +192,7 @@ def add_event_form(groups):
         if submitted:
             if group_name and event_title and event_description and event_date and event_location_name:
                 try:
+                    # geopyを使用して地名から緯度・経度を取得
                     geolocator = Nominatim(user_agent="student-groups-app")
                     location = geolocator.geocode(event_location_name)
                     if location:
@@ -203,8 +204,8 @@ def add_event_form(groups):
                                     "description": event_description,
                                     "date": str(event_date),
                                     "location": event_location_name,
-                                    "latitude": lat,
-                                    "longitude": lon,
+                                    "latitude": lat, # 緯度
+                                    "longitude": lon, # 経度
                                     "capacity": event_capacity
                                 })
                                 save_data(groups)
@@ -218,6 +219,7 @@ def add_event_form(groups):
                 st.error("すべての項目を入力してください。")
 
 # イベントマップ表示
+# イベント情報を地図上にマッピングする
 def display_map(groups):
     st.header("イベントマップ")
     map_data = []
@@ -237,7 +239,7 @@ def display_map(groups):
     else:
         st.write("現在、地図に表示できるイベントはありません。")
 
-# 管理者画面
+# サークル管理者画面
 def admin_panel(groups):
     st.header("管理者画面")
 
@@ -250,11 +252,12 @@ def admin_panel(groups):
         selected_group = st.selectbox("管理するサークルを選択してください", [group["name"] for group in groups])
         password_input = st.text_input("パスワードを入力してください", type="password")
 
+        # ログイン処理
         if st.button("認証"):
             group = next((g for g in groups if g["name"] == selected_group), None)
             if group and check_password(password_input, group["password"]):  # ハッシュを比較
                 st.session_state["authenticated_group"] = selected_group
-                st.session_state["authenticated"] = True
+                st.session_state["authenticated"] = True # セッションを更新してログイン状態にする
                 st.success(f"サークル '{selected_group}' の管理画面にアクセスしました！")
                 st.rerun()
             else:
@@ -285,7 +288,7 @@ def admin_panel(groups):
                     else:
                         st.markdown("- 応募者なし")
 
-                    # 操作ボタンを縦に配置
+                    # 削除ボタン
                     if st.button(f"イベントを削除 ({event['title']})", key=f"delete_{group['name']}_{event_index}"):
                         st.session_state["delete_event"] = {
                             "group_name": group["name"],
@@ -305,7 +308,7 @@ def admin_panel(groups):
 
                             if submitted:
                                 try:
-                                    # 新しい場所の座標を取得
+                                    # 更新された場所をもとに新しい場所の座標を取得
                                     geolocator = Nominatim(user_agent="student-groups-app")
                                     location = geolocator.geocode(new_location)
                                     if location:
@@ -364,7 +367,7 @@ def admin_panel(groups):
                                 "latitude": lat,
                                 "longitude": lon,
                                 "capacity": event_capacity,
-                                "category": event_category  # ← カテゴリーを保存
+                                "category": event_category 
                             })
                             save_data(groups)
                             st.success(f"イベント '{event_title}' を団体 '{selected_group}' に登録しました！")
