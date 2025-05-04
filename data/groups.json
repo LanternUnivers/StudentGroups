@@ -35,6 +35,15 @@
                 "latitude": 35.7175966,
                 "longitude": 139.7975626,
                 "capacity": 1
+            },
+            {
+                "title": "testtest",
+                "description": "A",
+                "date": "2025-05-04",
+                "location": "東京駅",
+                "latitude": 35.6820513,
+                "longitude": 139.7658294,
+                "capacity": 1
             }
         ],
         "icon": null

@@ -6,8 +6,11 @@ from geopy.geocoders import Nominatim
 from PIL import Image
 import bcrypt
 import plotly.express as px
-import calplot
 import matplotlib.pyplot as plt
+from matplotlib import rcParams
+
+# 日本語フォントを設定
+rcParams['font.family'] = 'Yu Gothic'  # Windowsの場合、'Meiryo' も可
 
 # 定数
 DATA_FILE = "data/groups.json"
@@ -166,51 +169,6 @@ def display_map(groups):
     else:
         st.write("現在、地図に表示できるイベントはありません。")
 
-def display_monthly_calendar(groups):
-    st.header("月間イベントカレンダー")
-
-    # イベントデータを整理
-    events = []
-    for group in groups:
-        if "events" in group and group["events"]:
-            for event in group["events"]:
-                events.append({
-                    "日付": event.get("date", "未設定"),
-                    "イベント名": event["title"],
-                    "団体名": group["name"]
-                })
-
-    # データフレームに変換
-    if events:
-        df = pd.DataFrame(events)
-        df["日付"] = pd.to_datetime(df["日付"], errors="coerce")  # 日付をパース
-        df = df.dropna(subset=["日付"])  # 日付が無効な行を削除
-
-        # 月を選択するセレクトボックス
-        months = df["日付"].dt.to_period("M").unique()
-        selected_month = st.selectbox("表示する月を選択してください", months)
-
-        # 選択された月のデータをフィルタリング
-        filtered_df = df[df["日付"].dt.to_period("M") == selected_month]
-
-        # 日付ごとのイベント数をカウント
-        event_counts = filtered_df.groupby("日付").size()
-
-        # カレンダーを描画
-        fig, ax = calplot.calplot(
-            event_counts,
-            how="sum",
-            cmap="Blues",
-            colorbar=True,
-            figsize=(10, 5),
-            suptitle=f"{selected_month} のイベントカレンダー"
-        )
-
-        # Streamlitに表示
-        st.pyplot(fig)
-    else:
-        st.write("現在、カレンダーに表示できるイベントはありません。")
-
 # 管理者画面
 def admin_panel(groups):
     st.header("管理者画面")
@@ -342,7 +300,7 @@ def main():
         st.session_state["current_tab"] = "イベント一覧"  # 初期タブを設定
 
     # タブの選択
-    tabs = ["イベント一覧", "イベントマップ", "月間イベントカレンダー", "サークルを登録する", "サークル管理者画面"]
+    tabs = ["イベント一覧", "イベントマップ", "サークルを登録する", "サークル管理者画面"]
     selected_tab = st.selectbox("タブを選択してください", tabs, index=tabs.index(st.session_state["current_tab"]))
 
     # タブが変更された場合にリロード
@@ -356,8 +314,6 @@ def main():
         display_event_list(groups)
     elif selected_tab == "イベントマップ":
         display_map(groups)
-    elif selected_tab == "月間イベントカレンダー":
-        display_monthly_calendar(groups)
     elif selected_tab == "サークルを登録する":
         add_group_form(groups)
     elif selected_tab == "サークル管理者画面":
