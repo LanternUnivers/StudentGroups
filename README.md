@@ -1,7 +1,7 @@
 ## Beginner's Hackathonで開発したアプリ
-このアプリは 5/3~5/4 の2日間で行われたBeginner's Hackathonの開発結果になります。
-デプロイURL: https://student-groups-rally.streamlit.app/
-発表資料: https://docs.google.com/presentation/d/1P2dXEAzEXQKvtt2Qp-PtNa71sYYhz9CDKgTt4Moyth4/edit?usp=sharing
+このアプリは 5/3~5/4 の2日間で行われたBeginner's Hackathonの開発結果になります。  
+デプロイURL: https://student-groups-rally.streamlit.app/  
+発表資料: https://docs.google.com/presentation/d/1P2dXEAzEXQKvtt2Qp-PtNa71sYYhz9CDKgTt4Moyth4/edit?usp=sharing  
 
 # StudentGroups
 
